@@ -21,15 +21,10 @@ function OrderList() {
       <div className="inline-block min-w-full  rounded-lg overflow-hidden">
         <div className="flex items-center justify-between p-4 mt-3">
           <h1 className="text-3xl font-semibold">
-            Order <span className="text-black-400"></span>
+            Payment<span className="text-black-400"></span>
           </h1>
           <div className='flex gap-3'>
-            <Button
-              label="Cancel"
-              variant="transparent"
-              size="lg"
-              className="text-sm w-[150px]"
-            />
+
             <Link to={'/payment_statistics'}> <Button
               label="View payment statistics"
               variant="solid"
