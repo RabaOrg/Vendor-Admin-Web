@@ -37,20 +37,20 @@ export const handleDeleteCustomer= async (id, forminfo) => {
      
     return data.data
 }
-export const handleGetloanApplication = async () => {
-     const  data  = await axiosInstance.get("/api/admin/applications?page=1&limit=20");
+export const handleGetloanApplication = async ({ page = 1, limit = 10 }) => {
+  const { data } = await axiosInstance.get(`/api/admin/applications?page=${page}&limit=${limit}`);
+  return data;
+};
+
+export const handleGetGuarantor = async ({ page = 1, limit = 10 }) => {
+     const  data  = await axiosInstance.get(`/api/admin/guarantors?page=${page}&limit=${limit}`);
      
-    return data.data
+    return data
 }
-export const handleGetGuarantor = async () => {
-     const  data  = await axiosInstance.get("/api/admin/guarantors?page=1&limit=10");
+export const handleGetGuarantorVerification = async ({ page = 1, limit = 10 }) => {
+     const  data  = await axiosInstance.get(`/api/admin/guarantor-verifications?page=${page}&limit=${limit}`);
      
-    return data.data
-}
-export const handleGetGuarantorVerification = async () => {
-     const  data  = await axiosInstance.get("/api/admin/guarantor-verifications?page=1&limit=10");
-     
-    return data.data
+    return data
 }
 export const handleGetSingleGuarantor = async (id) => {
      const  data  = await axiosInstance.get(`/api/admin/guarantors/${id}`);
@@ -90,11 +90,12 @@ export const handleGetActivation = async () => {
      
     return data.data
 }
-export const handleGetVendors= async () => {
-     const data  = await axiosInstance.get("/api/admin/vendors?page=1&limit=20");
+export const handleGetVendors= async ({ page = 1, limit = 10 }) => {
+     const data  = await axiosInstance.get(`/api/admin/vendors?page=${page}&limit=${limit}`);
      
-    return data.data
+    return data
 }
+
 
 
 export const  handleRepayment = async (formInfo) => {

@@ -109,11 +109,11 @@ export const useFetchSingleLoan= (id) => {
 
 
 
-export const useFetchVendorData = () => {
+export const useFetchVendorData = ({ page, limit  }) => {
    
     return useQuery({
-        queryFn: () => handleGetVendors(),
-        queryKey: ["getvendors"]
+        queryFn: () => handleGetVendors({ page, limit  }),
+        queryKey: ["getvendors",page, limit]
         
         
     })

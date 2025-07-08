@@ -167,7 +167,7 @@ function ViewGuarantor() {
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Basic Information */}
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Customer Information</h3>
             <div className="space-y-4">
@@ -327,7 +327,7 @@ function ViewGuarantor() {
           </div>
 
 
-          {/* Loan Details */}
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Verifications</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

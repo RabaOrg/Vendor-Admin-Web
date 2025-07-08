@@ -8,7 +8,8 @@ import { useFetchGuarantor, useFetchGuarantorVerification } from '../../../hooks
 
 
 function GuarantorVerification() {
-  const { data: guarantorList, isPending, isError } = useFetchGuarantorVerification()
+  const [page, setPage] = useState(1);
+  const { data: guarantorList, isPending, isError } = useFetchGuarantorVerification({ page, limit: 10 })
   console.log(guarantorList)
   const [selectedId, setSelectedId] = useState(null);
   const navigate = useNavigate();
@@ -52,8 +53,8 @@ function GuarantorVerification() {
           </thead>
 
           <tbody>
-            {Array.isArray(guarantorList?.data) &&
-              guarantorList.data.map((item) => (
+            {Array.isArray(guarantorList?.data?.data) &&
+              guarantorList.data.data.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
@@ -79,12 +80,16 @@ function GuarantorVerification() {
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
                     <span
                       className={`font-medium text-xs px-3 py-1 rounded ${item.status === 'completed'
-                        ? 'bg-[#ccf0eb] text-[#00B69B]'
-                        : item.status === 'pending'
-                          ? 'bg-orange-100 text-[#FFA756]'
-                          : item.status === 'rejected'
-                            ? 'bg-red-300 text-[#EF3826]'
-                            : 'bg-gray-200 text-gray-700'
+                        ? 'bg-[#ccf0eb] text-[#00B69B]' :
+                        item.status === 'accessed'
+                          ? 'bg-[#ccf0eb] text-[#00B69B]' :
+                          item.status === 'sent'
+                            ? 'bg-[#ccf0eb] text-[#00B69B]'
+                            : item.status === 'pending'
+                              ? 'bg-orange-100 text-[#FFA756]'
+                              : item.status === 'rejected'
+                                ? 'bg-red-300 text-[#EF3826]'
+                                : 'bg-gray-200 text-gray-700'
                         }`}
                     >
                       {item.status}
@@ -99,6 +104,27 @@ function GuarantorVerification() {
           </tbody>
         </table>
       </div>
+      {guarantorList?.data?.meta?.total_pages > 1 && (
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className={`px-4 py-2 text-white ${page === 1 ? 'bg-gray-400' : 'bg-green-700 hover:bg-green-700'} rounded-lg`}
+          >
+            Previous
+          </button>
+          <span className="text-sm font-medium">
+            Page {page} of {guarantorList?.data?.meta?.total_pages}
+          </span>
+          <button
+            onClick={() => setPage((prev) => Math.min(prev + 1, guarantorList?.data?.meta?.total_pages))}
+            disabled={page === guarantorList?.data?.meta?.total_pages}
+            className={`px-4 py-2 text-white ${page === guarantorList?.data?.meta?.total_pages ? 'bg-gray-400' : 'bg-green-800 hover:bg-green-700'} rounded-lg`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   )
 

@@ -99,7 +99,7 @@ function Dashboard() {
             icon: '/Icon.png',
         },
         {
-            label: 'Total Applications',
+            label: 'Completion Rate',
             value: datas?.conversion_funnel?.completion_rate,
 
             icon: '/Icon.png',

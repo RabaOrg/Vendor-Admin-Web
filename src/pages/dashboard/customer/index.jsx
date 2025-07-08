@@ -44,7 +44,7 @@ function Customer() {
                 <div className="flex justify-between flex-col md:flex-row w-full gap-4 py-6">
                     <h1 className="text-3xl font-semibold text-black mb-4 md:mb-0">Customer</h1>
 
-                    <div className="relative w-full md:w-[700px]">
+                    {/* <div className="relative w-full md:w-[700px]">
                         <input
                             type="text"
                             name='search'
@@ -56,7 +56,7 @@ function Customer() {
                         <span className="absolute left-3 top-[22px] transform -translate-y-1/2 text-gray-400">
                             <FaSearch />
                         </span>
-                    </div>
+                    </div> */}
                     <Link to="/addcustomer">
                         <Button
                             label="View Customer Statistics"
