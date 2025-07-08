@@ -266,7 +266,7 @@ function ViewActivation() {
               <option value="">Select an option</option>
               <option value="pending">pending</option>
               <option value="under_review">under_review</option>
-              <option value="under_review">approved</option>
+              <option value="approved">approved</option>
 
               <option value="suspended">rejected</option>
 
