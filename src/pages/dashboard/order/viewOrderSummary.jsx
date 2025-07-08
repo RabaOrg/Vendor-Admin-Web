@@ -65,7 +65,7 @@ function ViewOrderSummary() {
   ];
 
   if (isPending) {
-    return <p className="text-center text-gray-600 py-10">Loading order statistics...</p>;
+    return <p className="text-center text-gray-600 py-10">Loading payment statistics...</p>;
   }
 
   if (isError) {
