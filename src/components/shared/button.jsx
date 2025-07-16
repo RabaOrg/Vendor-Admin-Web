@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 const Button = ({
     label,
     onClick,
+    onChange,
     variant = "solid",
     size = "md",
     disabled = false,
@@ -29,6 +30,7 @@ const Button = ({
     return (
         <button
             onClick={onClick}
+            onChange={onChange}
             disabled={disabled || loading}
             type={type}
             className={`${baseClass} ${sizeClass} ${variantClass} ${disabled || loading ? "opacity-50 cursor-not-allowed" : ""}`}
