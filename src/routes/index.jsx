@@ -37,6 +37,10 @@ import ApplicationPayment from "../pages/dashboard/application/applicationPay/pa
 import SingleRecurring from "../pages/dashboard/transaction/singlerecurring";
 import Notification from "../pages/dashboard/notification";
 
+import SmsApplication from "../pages/dashboard/notification/smsnotification/smsapplication";
+import EachSmsNotification from "../pages/dashboard/notification/smsnotification/eachsmsnotification";
+import CreateSmsApplication from "../pages/dashboard/notification/smsnotification/createsmsapplication";
+
 
 
 
@@ -139,6 +143,16 @@ export const router = createBrowserRouter([
 
             },
             {
+                path: "/email_notification",
+                element: <SmsApplication />
+
+            },
+            {
+                path: "/create_sms_notification/:id",
+                element: <CreateSmsApplication />
+
+            },
+            {
                 path: "/notification",
                 element: <Notification />
 
@@ -146,6 +160,11 @@ export const router = createBrowserRouter([
             {
                 path: "/view_guarantor/:id",
                 element: <ViewGuarantor />
+
+            },
+            {
+                path: "/vendor_sms_application/:id",
+                element: <EachSmsNotification />
 
             },
 

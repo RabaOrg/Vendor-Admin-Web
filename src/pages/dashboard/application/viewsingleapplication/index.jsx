@@ -18,7 +18,12 @@ function SingleApplication() {
   const [showPreview, setShowPreview] = useState(false);
   const [bankId, setBankId] = useState('')
   const [selectedStatus, setSelectedStatus] = useState("");
-  // const { data: bankStatement } = useFetchBankStatement(bankId)
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+
+  const imageUrl = singleLoan?.documents?.id_card?.s3_key
+    ? `https://rabaserver-development.s3.amazonaws.com/${singleLoan?.documents?.id_card?.s3_key}`
+    : null;
+
 
 
   console.log(singleLoan)
@@ -33,7 +38,7 @@ function SingleApplication() {
         console.log(response.data)
 
         setLoanData(response.data);
-        // console.log(response.data.data.customer.id)
+
         setBankId(response.data.customer)
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -165,7 +170,7 @@ function SingleApplication() {
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Basic Information */}
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Customer Information</h3>
             <div className="space-y-4">
@@ -235,7 +240,7 @@ function SingleApplication() {
             </div>
           </div>
 
-          {/* Customer Information */}
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Product Information</h3>
             <div className="space-y-4">
@@ -316,7 +321,6 @@ function SingleApplication() {
           </div>
 
 
-          {/* Loan Details */}
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Application_type</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -446,24 +450,30 @@ function SingleApplication() {
               </div>
             </div>
           </div>
-          {/* Documents Section */}
+
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Uploaded Documents</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* ID Card Preview */}
+
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">ID Card</label>
+                <label className="block text-sm font-medium text-gray-600 mb-2">
+                  ID Card
+                </label>
                 <div className="border rounded-md p-3 bg-white shadow-sm">
-                  {singleLoan?.documents?.id_card?.s3_key ? (
+                  {imageUrl ? (
                     <>
+
                       <img
-                        src={`https://rabaserver-development.s3.amazonaws.com/${singleLoan?.documents?.id_card?.s3_key}`}
+                        src={imageUrl}
                         alt="ID Card"
-                        className="w-full h-60 object-contain rounded-md mb-3"
+                        className="w-full h-60 object-contain rounded-md mb-3 cursor-pointer hover:opacity-90 transition"
+                        onClick={() => setIsViewerOpen(true)}
                       />
+
+
                       <a
-                        href={`https://rabaserver-development.s3.amazonaws.com/${singleLoan?.documents?.id_card?.s3_key}`}
+                        href={imageUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-red-600 text-sm underline"
@@ -471,6 +481,28 @@ function SingleApplication() {
                       >
                         Download ID Card
                       </a>
+
+
+                      {isViewerOpen && (
+                        <div
+                          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                          onClick={() => setIsViewerOpen(false)}
+                        >
+                          <div className="relative">
+                            <img
+                              src={imageUrl}
+                              alt="ID Card Large View"
+                              className="max-w-[90vw] max-h-[90vh] rounded-md shadow-lg"
+                            />
+                            <button
+                              className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-200 transition"
+                              onClick={() => setIsViewerOpen(false)}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <p className="text-sm text-gray-500">No ID card uploaded.</p>
@@ -478,7 +510,6 @@ function SingleApplication() {
                 </div>
               </div>
 
-              {/* Bank Statement Preview */}
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-2">Bank Statement</label>
                 <div className="border rounded-md p-4 bg-white shadow-sm flex items-center justify-between">
@@ -513,29 +544,6 @@ function SingleApplication() {
 
 
 
-          {/* <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Repayment Schedule</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Start Date</label>
-                <input
-                  type="text"
-                  disabled
-                  value={repayment_dates?.start_date}
-                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">End Date</label>
-                <input
-                  type="text"
-                  disabled
-                  value={repayment_dates?.end_date}
-                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
-                />
-              </div>
-            </div>
-          </div> */}
           <div className="bg-gray-50 p-6 rounded-lg shadow md:col-span-2">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Status Update</h3>
             <label className="block text-sm text-gray-600 mb-1">

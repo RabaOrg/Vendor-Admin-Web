@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { handleGetNotification, handleGetSettingNotification } from "../../services/notification"
+import { handleGetNotification, handleGetSettingNotification, handleGetSmsNotification, handleGetVendorNotification } from "../../services/notification"
 
 export const useFetchGetNotification = () => {
    
@@ -11,6 +11,7 @@ export const useFetchGetNotification = () => {
     })
 
 }
+
 export const useFetchGetNotificationSettings = () => {
    
     return useQuery({
@@ -20,4 +21,24 @@ export const useFetchGetNotificationSettings = () => {
         
     })
 
+
 }
+export const useFetchGetSmsNotification = () => {
+   
+    return useQuery({
+        queryFn: () => handleGetSmsNotification(),
+        queryKey: ["smsnotification"],
+        
+        
+    })
+}
+export const useFetchGetVendorNotification = (id) => {
+   
+    return useQuery({
+        queryFn: () => handleGetVendorNotification(id),
+        queryKey: ["vendornotification", id],
+        
+        
+    })
+}
+
