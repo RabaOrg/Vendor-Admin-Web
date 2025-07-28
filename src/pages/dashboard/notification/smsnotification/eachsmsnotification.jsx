@@ -1,12 +1,21 @@
 import React from 'react'
 import { useFetchGetVendorNotification } from '../../../../hooks/queries/notification'
 import Button from '../../../../components/shared/button'
+import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 
 function EachSmsNotification() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { data: tokens } = useFetchGetVendorNotification(id)
 
+  const handleSms = (id) => {
+
+
+
+    navigate(`/create_sms_notification/${id}`);
+
+  }
   const getStatusBadgeClasses = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800';
     switch (status.toLowerCase()) {
@@ -16,10 +25,10 @@ function EachSmsNotification() {
         return 'bg-green-100 text-green-800';
       case 'submitted':
         return 'bg-green-100 text-green-800';
-      case 'processing':
-        return 'bg-purple-100 text-purple-800';
-      case 'in_review':
-        return 'bg-yellow-100 text-yellow-800';
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'awaiting_downpayment':
@@ -35,7 +44,7 @@ function EachSmsNotification() {
     }
   };
   return (
-    <div className="px-6 space-y-6">
+    <div className="px-6 pb-7 space-y-6">
       {Array.isArray(tokens) && tokens.length > 0 ? (
         tokens.map((token, index) => (
           <div
@@ -107,11 +116,37 @@ function EachSmsNotification() {
 
 
             </div>
+
           </div>
         ))
       ) : (
         <p className="text-center text-gray-500">No tokens found</p>
       )}
+      <div className="flex justify-between">
+        <Button
+          label="Create Sms Application"
+          variant="solid"
+          onClick={() => handleSms(id)}
+          size="md"
+          className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
+        />
+
+        <a
+          href="https://search.cac.gov.ng/ "
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 md:mt-0"
+        >
+          <Button
+            label="Verify CAC"
+            variant="solid"
+            onClick={() => handleSms(id)}
+            size="md"
+            className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
+          />
+        </a>
+      </div>
+
     </div>
 
 

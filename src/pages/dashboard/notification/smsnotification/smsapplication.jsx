@@ -21,13 +21,7 @@ function SmsApplication() {
 
   };
 
-  const handleSms = (id) => {
 
-
-
-    navigate(`/create_sms_notification/${id}`);
-
-  };
   return (
     <div className='px-6'>
       <div className="inline-block min-w-full rounded-lg overflow-hidden">
@@ -62,9 +56,7 @@ function SmsApplication() {
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">
                 View
               </th>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">
-                Created sms
-              </th>
+
             </tr>
           </thead>
           <tbody>
@@ -115,17 +107,7 @@ function SmsApplication() {
                       <FaEye className="text-gray-500" />
                     </button>
                   </td>
-                  <td>
 
-                    <Button
-                      label="Create Sms Application"
-                      variant="solid"
-                      onClick={() => handleSms(item?.vendor?.id)}
-                      size="md"
-                      className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
-                    />
-
-                  </td>
                 </tr>
               ))}
           </tbody>
