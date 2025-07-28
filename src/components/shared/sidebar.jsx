@@ -16,8 +16,8 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
         { name: "Vendor Management", icon: <Icons.Activation />, path: "/vendor_management" },
         { name: "Applications", icon: <Icons.Application />, path: "/application" },
         { name: "Guarantor Management", icon: <Icons.RepaymentPlan />, path: "/guarantor_list" },
-        { name: "Payment Details", icon: <Icons.Order />, path: "/payment_details" },
-        { name: "Recurring Debits", icon: <Icons.Transaction />, path: "/recurring_debits" },
+        // { name: "Payment Details", icon: <Icons.Order />, path: "/payment_details" },
+        // { name: "Recurring Debits", icon: <Icons.Transaction />, path: "/recurring_debits" },
         { name: "Repayment Schedules", icon: <Icons.Category />, path: "/repayment-plan" },
     ];
 
@@ -28,10 +28,14 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
     });
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+
 
     const handleItemClick = (item, path) => {
         setActiveItem(item);
         setIsSettingsOpen(false);
+        setIsPaymentOpen(false);
+
         toggleSidebar();
         navigate(path);
     };
@@ -39,13 +43,23 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
     const handleSettingsToggle = () => {
         setIsSettingsOpen(prev => !prev);
         setActiveItem("Settings");
+        setIsPaymentOpen(false);
+
     };
+    const handlePaymentToggle = () => {
+        setIsSettingsOpen(false);
+        setIsPaymentOpen(!isPaymentOpen);
+        setActiveItem("Payment");
+
+
+    };
+
 
     return (
         <div className={`${isOpen ? "block" : "hidden"} fixed top-0 left-0 w-64 h-full bg-white z-50 md:block`}>
             <div className="flex flex-col justify-between h-full p-5">
 
-                {/* Top Section: Logo */}
+
                 <div>
                     <button
                         onClick={toggleSidebar}
@@ -59,7 +73,7 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
                         <img src="/raba.png" alt="Logo" className="h-9 w-auto" />
                     </div>
 
-                    {/* Menu Items */}
+
                     <ul className="space-y-1 mt-14">
                         {menuItems.map((item) => (
                             <li
@@ -75,12 +89,45 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
                                 <span>{item.name}</span>
                             </li>
                         ))}
-
-                        {/* Settings Dropdown */}
                         <li
-                            className={`text-sm px-4 py-3 rounded cursor-pointer transition-colors 
-                                ${activeItem === "Settings"
-                                    ? "bg-[#0f5d30] text-white"
+                            className={`text-sm px-4 py-3 rounded cursor-pointer transition-colors
+    ${activeItem === "Payment"
+                                    ? "text-[#0f5d30] font-semibold"
+                                    : "text-gray-700 hover:bg-gray-200"
+                                }`}
+                        >
+                            <div onClick={handlePaymentToggle} className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg"><Icons.Transaction /></span>
+                                    <span>Payment</span>
+                                </div>
+                                {isPaymentOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </div>
+
+                            {isPaymentOpen && (
+                                <ul className="ml-6 mt-2 space-y-1 text-xs text-gray-700">
+                                    <li
+                                        className="hover:text-green-500 cursor-pointer"
+                                        onClick={() => handleItemClick("Payment Details", "/payment_details")}
+                                    >
+                                        Payment Details
+                                    </li>
+                                    <hr className="my-1 border-gray-300 w-5/6" />
+                                    <li
+                                        className="hover:text-green-500 cursor-pointer"
+                                        onClick={() => handleItemClick("Recurring Debit", "/recurring_debits")}
+                                    >
+                                        Recurring Debit
+                                    </li>
+                                </ul>
+                            )}
+                        </li>
+
+
+                        <li
+                            className={`text-sm px-4 py-3 rounded cursor-pointer transition-colors
+    ${activeItem === "Settings"
+                                    ? "text-[#0f5d30] font-semibold" // No green background, just bold green text
                                     : "text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
@@ -95,26 +142,26 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
                             {isSettingsOpen && (
                                 <ul className="ml-6 mt-2 space-y-1 text-xs text-gray-700">
                                     <li
-                                        className="hover:text-green-400 cursor-pointer text-white pb-1"
+                                        className="hover:text-green-500 cursor-pointer"
                                         onClick={() => handleItemClick("Notification", "/notification")}
                                     >
                                         Admin Notification Management
                                     </li>
                                     <hr className="my-1 border-gray-300 w-5/6" />
                                     <li
-                                        className="hover:text-green-400 cursor-pointer text-white pt-1"
+                                        className="hover:text-green-500 cursor-pointer"
                                         onClick={() => handleItemClick("SMS Notification", "/email_notification")}
                                     >
                                         SMS Notification
                                     </li>
                                 </ul>
                             )}
-
                         </li>
+
                     </ul>
                 </div>
 
-                {/* Bottom Section: Logout */}
+
                 <div
                     onClick={logOut}
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-700 hover:text-red-600 transition-colors"

@@ -9,13 +9,7 @@ function EachSmsNotification() {
   const navigate = useNavigate()
   const { data: tokens } = useFetchGetVendorNotification(id)
 
-  const handleSms = (id) => {
 
-
-
-    navigate(`/create_sms_notification/${id}`);
-
-  }
   const getStatusBadgeClasses = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800';
     switch (status.toLowerCase()) {
@@ -122,30 +116,6 @@ function EachSmsNotification() {
       ) : (
         <p className="text-center text-gray-500">No tokens found</p>
       )}
-      <div className="flex justify-between">
-        <Button
-          label="Create Sms Application"
-          variant="solid"
-          onClick={() => handleSms(id)}
-          size="md"
-          className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
-        />
-
-        <a
-          href="https://search.cac.gov.ng/ "
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 md:mt-0"
-        >
-          <Button
-            label="Verify CAC"
-            variant="solid"
-            onClick={() => handleSms(id)}
-            size="md"
-            className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
-          />
-        </a>
-      </div>
 
     </div>
 

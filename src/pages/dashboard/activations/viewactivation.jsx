@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Card, Label } from 'flowbite-react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../../../components/shared/button'
 import { toast } from 'react-toastify'
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { handleDeleteVendor, handleUpdateLoanStatus, handleUpdateVendorStatus, h
 
 function ViewActivation() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false)
   const [isverfied, setisVerified] = useState(false)
@@ -27,6 +29,13 @@ function ViewActivation() {
   const handleChangeVerificationStatus = (e) => {
     setSelectedVerificationStatus(e.target.value);
   };
+  const handleSms = (id) => {
+
+
+
+    navigate(`/create_sms_notification/${id}`);
+
+  }
   console.log(vendor)
   const handleUpdateStatus = async () => {
     if (selectedStatus === "") {
@@ -160,7 +169,30 @@ function ViewActivation() {
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Business Information</h3>
             <div className="space-y-4">
               <Input label="Business Name" value={vendor?.Business?.name} disabled />
-              <Input label="CAC Number" value={vendor?.Business?.cac_number} disabled />
+              <div className="relative w-full">
+                <Input
+                  label="CAC Number"
+                  value={vendor?.Business?.cac_number}
+                  disabled
+                  className="w-full pr-40"
+                />
+
+                <a
+                  href="https://search.cac.gov.ng/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute right-0 bottom-1"
+                >
+                  <Button
+                    label="Verify CAC"
+                    variant="solid"
+                    onClick={() => handleSms(id)}
+                    size="md"
+                    className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-6 md:mt-0"
+                  />
+                </a>
+              </div>
+
               <Input label="Category" value={vendor?.Business?.category} disabled />
               <Input label="Sub Category" value={vendor?.Business?.sub_category} disabled />
               <Input label="Monthly Revenue" value={vendor?.Business?.monthly_revenue} disabled />
@@ -288,7 +320,7 @@ function ViewActivation() {
 
             </div>
           </div>
-          <div className="p-6 flex justify-start gap-10">
+          <div className="p-6 flex gap-10">
 
             <Button
               label="Deactivate Vendor"
@@ -298,6 +330,14 @@ function ViewActivation() {
               className="text-sm px-6 py-3"
               loading={isLoad}
             />
+            <Button
+              label="Create Sms Application"
+              variant="solid"
+              onClick={() => handleSms(id)}
+              size="md"
+              className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
+            />
+
           </div>
 
         </div>
