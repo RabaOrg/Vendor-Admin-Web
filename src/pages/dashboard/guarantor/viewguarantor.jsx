@@ -31,7 +31,7 @@ function ViewGuarantor() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(`/api/admin/applications/${id}`,);
+        const response = await axiosInstance.get(`/api/admin/guarantors/${id}`,);
         console.log(response.data)
 
         setLoanData(response.data);
