@@ -439,11 +439,91 @@ function SingleApplication() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Tenure</label>
+                <label className="block text-sm text-gray-600 mb-1">Display Price</label>
                 <input
                   type="text"
                   disabled
-                  value={application_data?.product_price}
+                  value={application_data?.calculation_breakdown?.display_price}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Down Payment</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.down_payment}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Financed Amount</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.financed_amount}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Lease Time Months</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.lease_time_months}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Monthly Interest Rate</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.monthly_interest_rate}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Raba Markup</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.raba_markup}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Total Interest</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.total_interest}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Total With Markup</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.total_with_markup}
+
+                  className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Monthly Interest Rate</label>
+                <input
+                  type="text"
+                  disabled
+                  value={application_data?.calculation_breakdown?.monthly_interest_rate}
 
                   className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
                 />

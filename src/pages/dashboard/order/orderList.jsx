@@ -23,15 +23,27 @@ function OrderList() {
           <h1 className="text-3xl font-semibold">
             Payment Details<span className="text-black-400"></span>
           </h1>
-          <div className='flex gap-3'>
+          <div className='flex gap-5'>
+            <div className=''>
 
-            <Link to={'/payment_statistics'}> <Button
-              label="View payment statistics"
-              variant="solid"
+              <Link to={'/payment_statistics'}> <Button
+                label="View payment statistics"
+                variant="solid"
 
-              size="md"
-              className="text-sm px-6 py-5"
-            /></Link>
+                size="md"
+                className="text-sm px-6 py-5"
+              /></Link>
+            </div>
+            <div className=''>
+
+              <Link to={'/payment_statistics'}> <Button
+                label="View transaction history"
+                variant="solid"
+
+                size="md"
+                className="text-sm px-6 py-5"
+              /></Link>
+            </div>
           </div>
         </div>
         <table className="min-w-full leading-normal mt-3 ">

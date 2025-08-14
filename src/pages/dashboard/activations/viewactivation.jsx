@@ -151,6 +151,30 @@ function ViewActivation() {
             {vendor?.account_status}
           </span>
         </div>
+        <div className="p-6 mt-4 bg-white rounded-xl">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">📈 Vendor Statistics</h2>
+
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            {[
+              { label: "Total Applications", value: vendor?.statistics?.total_applications },
+              { label: "Total Customers", value: vendor?.statistics?.total_customers },
+              { label: "Total Products", value: vendor?.statistics?.total_products },
+            ].map((stat, index) => (
+              <div
+                key={index}
+                className="bg-gray-50 border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow transition"
+              >
+                <p className="text-sm text-gray-500">{stat.label}</p>
+                <p className="text-2xl font-semibold text-gray-800 mt-2">
+                  {stat.value ?? "—"}
+                </p>
+              </div>
+            ))}
+          </div>
+
+
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
 
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
@@ -212,12 +236,19 @@ function ViewActivation() {
 
 
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Statistics</h3>
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Interest Rate</h3>
             <div className="space-y-4">
-              <Input label="Total Applications" value={vendor?.statistics?.total_applications} disabled />
-              <Input label="Total Customers" value={vendor?.statistics?.total_customers} disabled />
-              <Input label="Total Products" value={vendor?.statistics?.total_products} disabled />
+
+
+              <Input
+                label="Interest Rate (Please input the interest rate)"
+                value={interest}
+                type="number"
+                onChange={(e) => setInterest(e.target.value)}
+              />
+
             </div>
+
           </div>
           {Array.isArray(vendor?.business_photos) && vendor.business_photos.length > 0 && (
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
@@ -238,14 +269,7 @@ function ViewActivation() {
               </div>
             </div>
           )}
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Interest Rate</h3>
-            <Input
-              label="Interest Rate (Please input the interest rate)"
-              value={interest}
-              onChange={(e) => setInterest(e.target.value)}
-            />
-          </div>
+
 
 
 
