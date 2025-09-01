@@ -19,36 +19,47 @@ function RepaymentPlan() {
 
 
   const formik = useFormik({
-
     initialValues: {
-      tenure_unit: "",
-      description: "",
-      weekly_tenure_min: "",
-      weekly_tenure_max: "",
-      monthly_tenure_min: "",
-      monthly_tenure_max: "",
-      down_percent_min: "",
-      down_percent_max: ""
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      employee_id: "",
+      position: "",
+      department: "",
+      hire_date: "",
+      commission_rate: "",
+      target_monthly_sales: "",
+      notes: ""
     },
-
     validationSchema: Yup.object({
-
-      tenure_unit: Yup.string().required("Tenure_unit is required"),
-
-      description: Yup.string().required("Description is required"),
-      weekly_tenure_max: Yup.string().required("Weekly_tenure_max is required"),
-      weekly_tenure_min: Yup.string().required("Weekly_tenure_min is required"),
-      monthly_tenure_max: Yup.string().required("Monthly_tenure_max is required"),
-      monthly_tenure_min: Yup.string().required("Monthly_tenure_min is required"),
-      down_percent_min: Yup.string().required("Down_percent_min is required"),
-      down_percent_max: Yup.string().required("Down_percent_max is required")
-
+      first_name: Yup.string().required("First name is required"),
+      last_name: Yup.string().required("Last name is required"),
+      email: Yup.string().email("Invalid email").required("Email is required"),
+      phone_number: Yup.string().required("Phone number is required"),
+      employee_id: Yup.string().required("Employee ID is required"),
+      position: Yup.string().required("Position is required"),
+      department: Yup.string().required("Department is required"),
+      hire_date: Yup.date().required("Hire date is required"),
+      commission_rate: Yup.number().typeError("Must be a number").required("Commission rate is required"),
+      target_monthly_sales: Yup.number().typeError("Must be a number").required("Target monthly sales is required"),
+      notes: Yup.string().required("Notes are required"),
     }),
     onSubmit: async (values) => {
-      onMutate(values)
-
+      // Format fields properly before sending
+      const payload = {
+        ...values,
+        commission_rate: parseFloat(values.commission_rate),
+        target_monthly_sales: parseFloat(values.target_monthly_sales),
+        hire_date: new Date(values.hire_date).toISOString(),
+        phone_number: values.phone_number.trim(),
+        position: values.position.trim(),
+        department: values.department.trim()
+      }
+      onMutate(payload)
     },
   });
+
   const { mutate: onMutate, isPending, isError } = useMutation({
     mutationFn: async (values) =>
       handleRepayment(values)

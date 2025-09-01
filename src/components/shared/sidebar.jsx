@@ -19,6 +19,7 @@ const SidebarComponent = ({ isOpen, toggleSidebar }) => {
         // { name: "Payment Details", icon: <Icons.Order />, path: "/payment_details" },
         // { name: "Recurring Debits", icon: <Icons.Transaction />, path: "/recurring_debits" },
         { name: "Repayment Schedules", icon: <Icons.Category />, path: "/repayment-plan" },
+        { name: "Agent Management", icon: <Icons.Transaction />, path: "/agent_management" },
     ];
 
     const [activeItem, setActiveItem] = useState(() => {
