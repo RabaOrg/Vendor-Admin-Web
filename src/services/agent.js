@@ -23,16 +23,16 @@ export const handleAgentActive = async () => {
     
     return data.data
 }
-export const handleDeleteAgent = async (id) => {
+export const handleDeleteAgent = async (id,) => {
    
     const { data } = await axiosInstance.delete(`/api/admin/agents/${id}`);
     
     return data.data
 }
 
-export const handleUpdateAgent = async (id) => {
+export const handleUpdateAgent = async (id, forminfo) => {
    
-    const { data } = await axiosInstance.put(`/api/admin/agents/${id}`);
+    const { data } = await axiosInstance.put(`/api/admin/agents/${id}`, forminfo);
     
     return data.data
 }
