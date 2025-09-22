@@ -5,9 +5,9 @@ import axiosInstance from "../../store/axiosInstance";
 
 
 export const handleGetRepayment = async () => {
-     const { data } = await axiosInstance.get(`/api/admin/payments/schedules?page=1&limit=20`);
+     const { data } = await axiosInstance.get(`/api/admin/repayment-plans`);
      
-    return data.data
+    return data
 }
 export const handleDeleteApplication= async (id, forminfo) => {
   const { data } = await axiosInstance.delete(`/api/admin/applications/${id}`, {

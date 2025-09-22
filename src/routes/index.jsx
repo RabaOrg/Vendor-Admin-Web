@@ -44,6 +44,11 @@ import AgentManagement from "../pages/dashboard/Agent";
 import SingleAgent from "../pages/dashboard/Agent/singleagent";
 import AgentStatistics from "../pages/dashboard/Agent/statistics";
 import CreateAgent from "../pages/dashboard/Agent/createagent";
+import TransactionDetails from "../pages/dashboard/transactiondetails/transactionList";
+import SingleTransaction from "../pages/dashboard/transactiondetails/singletransaction";
+import TransactionStatistics from "../pages/dashboard/transactiondetails/transactionstats";
+import ProductStats from "../pages/product/productstat/statistics";
+import ProductVendor from "../pages/dashboard/activations/productvendor";
 
 
 
@@ -108,6 +113,16 @@ export const router = createBrowserRouter([
 
             },
             {
+                path: "/product_statistics",
+                element: <ProductStats />
+
+            },
+            {
+                path: "/product_vendor/:id",
+                element: <ProductVendor />
+
+            },
+            {
                 path: "/addproduct",
                 element: <Addproduct />
 
@@ -120,6 +135,26 @@ export const router = createBrowserRouter([
             {
                 path: "/customer-details/:id",
                 element: <UpdateCustomer />
+
+            },
+            {
+                path: "/agent_statistics",
+                element: <AgentStatistics />
+
+            },
+            {
+                path: "/transaction_details",
+                element: <TransactionDetails />
+
+            },
+            {
+                path: "/transaction_statistics",
+                element: <TransactionStatistics />
+
+            },
+            {
+                path: "/single_transaction/:id",
+                element: <SingleTransaction />
 
             },
             {

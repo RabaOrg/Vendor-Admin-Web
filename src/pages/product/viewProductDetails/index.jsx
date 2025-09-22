@@ -1,28 +1,75 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Card, Label } from 'flowbite-react'
-
+import Button from '../../../components/shared/button'
+import { toast } from 'react-toastify'
 import { useFetchCategory, useFetchSingleProduct } from '../../../hooks/queries/product'
 import axiosInstance from '../../../../store/axiosInstance'
+import { handleApproveProduct, handleRejectProd } from '../../../services/product'
 
 function ViewProductDetails() {
   const { id } = useParams()
+
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isRejecting, setIsRejecting] = useState(false);
+
   const { data: oneProduct, isPending, isError } = useFetchSingleProduct(id)
   const { data: category } = useFetchCategory()
   console.log(category)
+  const [isLoad, setIsLoad] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Ensure category is an array before using .find()
   const categoryDetails = Array.isArray(category)
     ? category.find(cat => cat.id === oneProduct?.category_id) || {}
     : {};
+  console.log(categoryDetails)
 
   useEffect(() => {
     handleGetSingleProduct()
   }, [])
 
   const handleGetSingleProduct = async () => {
-    const data = await axiosInstance.get(`/admin/products/${id}`);
+    const data = await axiosInstance.get(`api/admin/products/${id}`);
     console.log(data)
+  }
+  const handleRejectWithReason = async () => {
+    if (!rejectionReason.trim()) return;
+
+    setIsRejecting(true);
+    try {
+      const response = await handleRejectProd(id, { rejection_reason: rejectionReason });
+      toast.success("Product rejected successfully");
+      setShowRejectModal(false);
+      setRejectionReason("");
+
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || "Failed to reject product";
+      toast.error(errorMessage);
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
+
+  const handleApprove = async () => {
+    setIsLoading(true)
+    try {
+      console.log(id)
+      const response = await handleApproveProduct(id)
+
+      toast.success("Vendor approved successfully")
+
+
+    } catch (error) {
+      console.log(error)
+      const errorMessage =
+        error?.response?.data?.message || "Failed to delete application";
+
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -189,8 +236,58 @@ function ViewProductDetails() {
             )}
 
           </div>
+
         </div>
       </div>
+      <div className="p-6 flex gap-10">
+        <Button
+          label="Reject Product"
+          onClick={() => setShowRejectModal(true)}
+          variant="transparent"
+          size="md"
+          className="text-sm px-6 py-3"
+        />
+        <Button
+          label="Approve Product"
+          onClick={handleApprove}
+          variant="solid"
+          size="md"
+          loading={isLoading}
+          className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
+        />
+      </div>
+      {showRejectModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 p-6">
+            <h3 className="text-lg font-semibold mb-4 text-red-600">Reject Product</h3>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter reason for rejection"
+              className="w-full p-3 border border-gray-300 rounded-md mb-4"
+              rows={4}
+            />
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRejectWithReason}
+                disabled={!rejectionReason.trim() || isRejecting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {isRejecting ? "Rejecting..." : "Reject Product"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
   );
 };

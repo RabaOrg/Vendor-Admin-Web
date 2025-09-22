@@ -10,14 +10,16 @@ import { toast } from 'react-toastify';
 import { BiUpload } from 'react-icons/bi'
 import { handleCreateProduct, handleDisplayProductImage, handleProductImage } from '../../services/product';
 import { Formik } from 'formik'
-import { useFetchCategory } from '../../hooks/queries/product'
+import { useFetchCat, useFetchCategory } from '../../hooks/queries/product'
 import { useFetchRepayment } from '../../hooks/queries/loan'
 
 function Addproduct() {
     const [loading, setIsLoading] = useState(false)
     const [isload, setIsLoad] = useState(false)
-    const { data: category, isPending, isError } = useFetchCategory()
+    const { data: category, isPending, isError } = useFetchCat()
+    console.log(category)
     const { data: repaymentPlan } = useFetchRepayment()
+    console.log(repaymentPlan)
     const [imageId, setImageId] = useState('')
     const [load, setLoad] = useState(false)
     const [selectedImage, setSelectedImage] = useState(null)
@@ -32,20 +34,23 @@ function Addproduct() {
         description: "",
         shipping_days_min: null,
         shipping_days_max: null,
-        category_id: 25,
+        category_id: "",
+        repayment_plan_id: "",
+        stock: null,
+        status: "",
+        vendor_id: null,
+        featured: "",
         price: "",
+        sub_category: "",
         specifications: [],
-        interest_rule: [{
-            monthly: { min: 0, max: 0, rate: 0 },
-            weekly: { min: 0, max: 0, rate: 0 }
-        }],
-        repayment_policies: {
-            description: "",
-            tenure_unit: "",
-            weekly_tenure: { min: null, max: null },
-            monthly_tenure: { min: null, max: null },
-            down_percentage: { min: null, max: null }
+        loan_terms: {
+            down_payment_percentage: null,
+            max_tenure_months: null,
+            interest_rate: null,
+            processing_fee: null,
         },
+        display_image: null,
+
 
     })
 
@@ -87,6 +92,15 @@ function Addproduct() {
             [name]: value
         }))
     }
+    const handleInputBoolean = (e) => {
+        const { name, value } = e.target;
+
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            [name]: name === "featured" ? value === "true" : value,
+        }));
+    };
+
     const handleInputs = (e) => {
         const { name, value } = e.target;
         const keys = name.split(".");
@@ -118,114 +132,109 @@ function Addproduct() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const weeklyRules = product.interest_rule
-            .filter(rule => rule.interval === 'weekly')
-            .map(rule => ({
-                min: rule.min ? Number(rule.min) : 0,
-                max: rule.max ? Number(rule.max) : 0,
-                rate: rule.rate ? Number(rule.rate) : 0,
-            }));
 
-        const monthlyRules = product.interest_rule
-            .filter(rule => rule.interval === 'monthly')
-            .map(rule => ({
-                min: rule.min ? Number(rule.min) : 0,
-                max: rule.max ? Number(rule.max) : 0,
-                rate: rule.rate ? Number(rule.rate) : 0,
-            }));
-        const payload = {
-            name: product.name,
-            description: product.description,
-            shipping_days_min: Number(product.shipping_days_min),
-            shipping_days_max: Number(product.shipping_days_max),
-            category_id: product.category_id,
-            price: product.price,
-            specifications: product.specifications.reduce((acc, spec) => {
+        try {
+            const formData = new FormData();
+
+
+            formData.append("name", product.name);
+            formData.append("description", product.description);
+            formData.append("shipping_days_min", Number(product.shipping_days_min));
+            formData.append("shipping_days_max", Number(product.shipping_days_max));
+            formData.append("category_id", product.category_id || "2");
+            formData.append("status", product.status);
+            formData.append("stock", product.stock);
+            formData.append("vendor_id", product.vendor_id || 0);
+
+            formData.append("lease_eligible", product.lease_eligible ? "true" : "false");
+            formData.append("featured", product.featured ? "true" : "false");
+
+            formData.append("price", product.price);
+            formData.append("repayment_plan_id", product.repayment_plan_id);
+
+            const specsObj = product.specifications.reduce((acc, spec) => {
                 if (spec.attribute) {
-
                     acc[spec.attribute.toLowerCase()] = spec.value;
                 }
                 return acc;
-            }, {}),
-            interest_rule: {
+            }, {});
+            formData.append("specifications", JSON.stringify(specsObj));
 
-                weekly: weeklyRules.length > 0 ? weeklyRules : { min: 0, max: 0, rate: 0 },
-                monthly: monthlyRules.length > 0 ? monthlyRules : [{ min: 0, max: 0, rate: 0 }],
-            },
-            repayment_policies: {
-                description: product.repayment_policies.description,
-                tenure_unit: "week",
-                weekly_tenure: {
-                    min: Number(product.repayment_policies.weekly_tenure.min),
-                    max: Number(product.repayment_policies.weekly_tenure.max)
-                },
-                monthly_tenure: {
-                    min: Number(product.repayment_policies.monthly_tenure.min),
-                    max: Number(product.repayment_policies.monthly_tenure.max)
-                },
-                down_percentage: {
-                    min: Number(product.repayment_policies.down_percentage.min),
-                    max: Number(product.repayment_policies.down_percentage.max)
-                }
+
+            const loanTerms = {
+                down_payment_percentage: Number(product.loan_terms.down_payment_percentage),
+                max_tenure_months: Number(product.loan_terms.max_tenure_months),
+                interest_rate: Number(product.loan_terms.interest_rate),
+                processing_fee: Number(product.loan_terms.processing_fee),
+            };
+            formData.append("loan_terms", JSON.stringify(loanTerms));
+
+
+            if (product.display_image) {
+                formData.append("display_image", product.display_image);
+
             }
-        };
 
-        console.log(payload);
-        setIsLoading(true);
-        try {
-            const response = await handleCreateProduct(payload);
-            console.log(response)
+            setIsLoading(true);
+
+            const response = await handleCreateProduct("/api/admin/products", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
             if (response.data) {
-                setImageId(response.data.id)
-                console.log(response.data.id)
                 toast.success("Product created successfully");
-
             }
-
-
-
         } catch (error) {
-            console.error('Error:', error);
+            console.error("Error:", error);
+            toast.error("Failed to create product");
         } finally {
             setIsLoading(false);
         }
     };
 
+
     const handleRepaymentPlanSelect = (e) => {
         const selectedPlanId = e.target.value;
-        const selectedPlan = repaymentPlan.find((plan) => plan.id === selectedPlanId);
+        const selectedPlan = repaymentPlan?.data?.repayment_plans?.find(
+            (plan) => plan.id === selectedPlanId
+        );
 
         if (selectedPlan) {
             setProduct((prevState) => ({
                 ...prevState,
+                repayment_plan_id: selectedPlanId,
                 repayment_policies: {
                     ...prevState.repayment_policies,
                     tenure_unit: selectedPlan.tenure_unit,
                     weekly_tenure: {
                         min: selectedPlan.weekly_tenure_min,
-                        max: selectedPlan.weekly_tenure_max
+                        max: selectedPlan.weekly_tenure_max,
                     },
                     monthly_tenure: {
                         min: selectedPlan.monthly_tenure_min,
-                        max: selectedPlan.monthly_tenure_max
+                        max: selectedPlan.monthly_tenure_max,
                     },
                     down_percentage: {
                         min: selectedPlan.down_percent_min,
-                        max: selectedPlan.down_percent_max
+                        max: selectedPlan.down_percent_max,
                     },
-                    description: selectedPlan.description
-                }
+                    description: selectedPlan.description,
+                },
             }));
         }
     };
 
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        setSelectedImage(file);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
         if (file) {
+            setProduct((prev) => ({
+                ...prev,
+                display_image: file,
+            }));
+
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onloadend = () => {
                 setPreview(reader.result);
             };
             reader.readAsDataURL(file);
@@ -359,9 +368,53 @@ function Addproduct() {
 
                                         />
                                     </div>
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor="shipping_days_max" value="Shipping Days Max" />
+                                        </div>
+                                        <input
+                                            style={{ color: "#202224", borderRadius: "8px" }}
+                                            id="stock"
+                                            type="number"
+                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                                            value={product.stock}
+                                            name='stock'
+                                            onChange={handleInput}
+                                            placeholder='Enter Stock'
+
+                                        />
+                                    </div>
 
                                 </div>
+                                <div className="flex flex-col gap-4 w-full lg:w-1/2">
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor="category" value="Category" />
+                                        </div>
+                                        <select
+                                            style={{ color: "#202224", borderRadius: "8px" }}
+                                            id="tenure_unit"
+                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                                            name="repayment_policies.tenure_unit"
+                                            value={product.repayment_plan_id ?? ""}
+                                            onChange={handleRepaymentPlanSelect}
+                                        >
+                                            <option value="">Select a Repayment Plan</option>
+                                            {isPending ? (
+                                                <option disabled>Loading...</option>
+                                            ) : isError ? (
+                                                <option disabled>Error loading categories</option>
+                                            ) : (
+                                                repaymentPlan?.data?.repayment_plans?.map((plan) => (
+                                                    <option key={plan.id} value={plan.id}>
+                                                        ({plan.tenure_unit})  {plan.description}
+                                                    </option>
+                                                ))
+                                            )}
+                                        </select>
 
+                                    </div>
+                                </div>
                                 <div className="flex flex-col gap-4 w-full lg:w-1/2">
                                     <div>
                                         <div className="mb-2 block">
@@ -398,15 +451,19 @@ function Addproduct() {
                                 <div className="flex flex-col gap-4 w-full lg:w-1/2">
                                     <div>
                                         <div className="mb-2 block">
-                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor="category" value="Category" />
+                                            <Label
+                                                className="text-[#212C25] text-xs font-[500]"
+                                                htmlFor="category"
+                                                value="Category"
+                                            />
                                         </div>
                                         <select
                                             style={{ color: "#202224", borderRadius: "8px" }}
                                             id="category"
-                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
                                             name="category_id"
                                             value={product.category_id}
                                             onChange={handleInput}
+                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
                                         >
                                             <option value="">Select a category</option>
                                             {isPending ? (
@@ -414,7 +471,7 @@ function Addproduct() {
                                             ) : isError ? (
                                                 <option disabled>Error loading categories</option>
                                             ) : (
-                                                category?.map((cat) => (
+                                                category?.data?.categories?.map((cat) => (
                                                     <option key={cat.id} value={cat.id}>
                                                         {cat.name}
                                                     </option>
@@ -422,7 +479,40 @@ function Addproduct() {
                                             )}
                                         </select>
                                     </div>
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor="featured" value="Featured" />
+                                        </div>
+                                        <select
+                                            style={{ color: "#202224", borderRadius: "8px" }}
+                                            id="featured"
+                                            name="featured"
+                                            value={product.featured ? 'true' : 'false'}
+                                            onChange={handleInputs}
+                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                                        >
+                                            <option value="true">True</option>
+                                            <option value="false">False</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div className="mb-2 block">
+                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor="status" value="Status" />
+                                        </div>
+                                        <select
+                                            style={{ color: "#202224", borderRadius: "8px" }}
+                                            id="status"
+                                            name="status"
+                                            value={product.status ? 'true' : 'false'}
+                                            onChange={handleInputs}
+                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                                        >
+                                            <option value="true">Active</option>
+                                            <option value="false">Inactive</option>
+                                        </select>
+                                    </div>
                                 </div>
+
                             </div>
                             <div className='p-10'>
                                 <div className=' flex mt-[-75px]'>
@@ -442,6 +532,98 @@ function Addproduct() {
                                     </div>
                                 </div>
                             </div>
+                            <div className='p-4'>
+
+
+                                <Card className="w-full bg-white rounded-2xl shadow-sm border border-gray-200">
+
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                                        <h3 className="text-lg font-semibold text-gray-800">Loan Terms</h3>
+                                    </div>
+
+
+                                    <div className="p-6 space-y-6">
+
+                                        <div className="flex flex-col gap-2">
+                                            <Label
+                                                htmlFor="down_payment_percentage"
+                                                className="text-sm font-medium text-gray-700"
+                                            >
+                                                Down Payment Percentage (%)
+                                            </Label>
+                                            <input
+                                                id="down_payment_percentage"
+                                                type="number"
+                                                name="loan_terms.down_payment_percentage"
+                                                placeholder="Enter down payment %"
+                                                value={product.loan_terms.down_payment_percentage}
+                                                onChange={handleInput}
+                                                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-green-700 focus:ring-2 focus:ring-green-700/30 focus:outline-none transition"
+                                            />
+                                        </div>
+
+
+                                        <div className="flex flex-col gap-2">
+                                            <Label
+                                                htmlFor="max_tenure_months"
+                                                className="text-sm font-medium text-gray-700"
+                                            >
+                                                Maximum Tenure (Months)
+                                            </Label>
+                                            <input
+                                                id="max_tenure_months"
+                                                type="number"
+                                                name="loan_terms.max_tenure_months"
+                                                placeholder="Enter max tenure in months"
+                                                value={product.loan_terms.max_tenure_months}
+                                                onChange={handleInput}
+                                                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-green-700 focus:ring-2 focus:ring-green-700/30 focus:outline-none transition"
+                                            />
+                                        </div>
+
+
+                                        <div className="flex flex-col gap-2">
+                                            <Label
+                                                htmlFor="interest_rate"
+                                                className="text-sm font-medium text-gray-700"
+                                            >
+                                                Interest Rate (%)
+                                            </Label>
+                                            <input
+                                                id="interest_rate"
+                                                type="number"
+                                                step="0.01"
+                                                name="loan_terms.interest_rate"
+                                                placeholder="Enter interest rate"
+                                                value={product.loan_terms.interest_rate}
+                                                onChange={handleInput}
+                                                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-green-700 focus:ring-2 focus:ring-green-700/30 focus:outline-none transition"
+                                            />
+                                        </div>
+
+
+                                        <div className="flex flex-col gap-2">
+                                            <Label
+                                                htmlFor="processing_fee"
+                                                className="text-sm font-medium text-gray-700"
+                                            >
+                                                Processing Fee
+                                            </Label>
+                                            <input
+                                                id="processing_fee"
+                                                type="number"
+                                                name="loan_terms.processing_fee"
+                                                placeholder="Enter processing fee"
+                                                value={product.loan_terms.processing_fee}
+                                                onChange={handleInput}
+                                                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-green-700 focus:ring-2 focus:ring-green-700/30 focus:outline-none transition"
+                                            />
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+
+
 
 
                             <div className='p-4'>
@@ -503,256 +685,71 @@ function Addproduct() {
                                         )}
                                     </div>
                                 </Card>
-                            </div>
 
+                                <div className='p-4'>
+                                    <Card className='w-full h-full bg-white'>
+                                        <h3 className='p-3 px-11'>Upload Images</h3>
+                                        <div className='w-full border-t-2 border-gray-200'></div>
+                                        <div className='flex gap-10  py-5 px-11'>
+                                            <div className='w-[17rem] flex gap-10 h-12 py-1 mt-4 px-4 rounded-md border-1 border-gray-200 shadow bg-white '>
 
-
-
-                            <div className='p-4'>
-                                <Card className='w-full h-full bg-white'>
-                                    <h3 className='p-3 px-7 flex justify-between items-center'>
-                                        <span>Product Interest Rate Rule</span>
-                                        <button
-                                            type="button"
-                                            className="bg-[#0f5d30] text-white px-4 py-2 rounded"
-                                            onClick={addInterestRule}
-                                        >
-                                            + Add Interest Rule
-                                        </button>
-                                    </h3>
-                                    <div className='w-full border-t-2 border-gray-200'></div>
-
-                                    {product.interest_rule.length === 0 ? (
-                                        <div className="p-10 text-center text-gray-500">
-                                            No product interval added yet
-                                        </div>
-                                    ) : (
-                                        product.interest_rule.map((rule, index) => (
-                                            <div key={index} className='flex flex-col lg:flex-row gap-12 px-7 pb-7 mt-4'>
-                                                <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                                                    <div>
-                                                        <div className="mb-2 block">
-                                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor={`interest-rule-interval-${index}`} value="Interval" />
-                                                        </div>
-                                                        <select
-                                                            style={{ color: "#202224", borderRadius: "8px" }}
-                                                            id={`interest-rule-interval-${index}`}
-                                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                            name="interval"
-                                                            value={rule.interval || ''}
-                                                            onChange={(e) => handleChangeInterest(index, e)}
-                                                        >
-                                                            <option value="" disabled>Select interval</option>
-                                                            <option value="weekly">Weekly</option>
-                                                            <option value="monthly">Monthly</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                                                    <div>
-                                                        <div className="mb-2 block">
-                                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor={`interest-rule-min-${index}`} value="Min" />
-                                                        </div>
-                                                        <input
-                                                            style={{ color: "#202224", borderRadius: "8px" }}
-                                                            id={`interest-rule-min-${index}`}
-                                                            type="number"
-                                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                            name="min"
-                                                            value={rule.min || ''}
-                                                            onChange={(e) => handleChangeInterest(index, e)}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                                                    <div>
-                                                        <div className="mb-2 block">
-                                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor={`interest-rule-max-${index}`} value="Max" />
-                                                        </div>
-                                                        <input
-                                                            style={{ color: "#202224", borderRadius: "8px" }}
-                                                            id={`interest-rule-max-${index}`}
-                                                            type="number"
-                                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                            name="max"
-                                                            value={rule.max || ''}
-                                                            onChange={(e) => handleChangeInterest(index, e)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                                                    <div>
-                                                        <div className="mb-2 block">
-                                                            <Label className="text-[#212C25] text-xs font-[500]" htmlFor={`interest-rule-rate-${index}`} value="Rate" />
-                                                        </div>
-                                                        <input
-                                                            style={{ color: "#202224", borderRadius: "8px" }}
-                                                            id={`interest-rule-rate-${index}`}
-                                                            type="number"
-                                                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                            name="rate"
-                                                            value={rule.rate || ''}
-                                                            onChange={(e) => handleChangeInterest(index, e)}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeInterestRule(index)}
-                                                    className="text-red-500 hover:text-red-700 mt-3 flex items-center gap-2"
-                                                >
-                                                    <FaMinus /> Remove
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
-                                </Card>
-                            </div>
-
-
-
-
-
-                            <div className='p-4'>
-                                <Card className='w-full h-full bg-white'>
-                                    <h3 className='p-3 px-7'>Create Repayment Plan</h3>
-                                    <div className='w-full border-t-2 border-gray-200'></div>
-
-                                    <div className='flex flex-col lg:flex-row gap-7 pb-7 mt-5 px-7'>
-                                        <div className="flex flex-col gap-4 w-full lg:w-1/2">
-                                            <div>
-                                                <div className="mb-2 block">
-                                                    <Label className="text-[#212C25] text-xs font-[500]" htmlFor="tenure_unit" value="Tenure Unit" />
-                                                </div>
-                                                <select
-                                                    style={{ color: "#202224", borderRadius: "8px" }}
-                                                    id="Enter tenure unit"
-                                                    className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                    name="repayment_policies.tenure_unit"
-                                                    value={product.repayment_policies?.tenure_unit ?? ""}
-                                                    onChange={handleRepaymentPlanSelect}
-                                                >
-                                                    <option value="">Select a Repayment Plan</option>
-                                                    {isPending ? (
-                                                        <option disabled>Loading...</option>
-                                                    ) : isError ? (
-                                                        <option disabled>Error loading categories</option>
-                                                    ) : (
-                                                        repaymentPlan?.map((cat) => (
-                                                            <option key={cat.id} value={cat.id}>
-                                                                {cat.id}
-                                                            </option>
-                                                        ))
-                                                    )}
-                                                </select>
-
-                                            </div>
-                                            <div>
-                                                <div className="mb-2 block">
-                                                    <Label className="text-[#212C25] text-xs font-[500]" htmlFor="weekly_tenure" value="Weekly Tenure" />
-                                                </div>
                                                 <div className='flex gap-2'>
                                                     <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                        type="number"
-                                                        value={product.repayment_policies.weekly_tenure.min ?? ""}
-                                                        name='repayment_policies.weekly_tenure.min'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder=' min'
+                                                        type="file"
+                                                        accept='image/*'
+                                                        hidden
+                                                        id="imageInput"
+                                                        onChange={handleImageChange}
                                                     />
-                                                    <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                        type="number"
-                                                        value={product.repayment_policies.weekly_tenure.max ?? ""}
-                                                        name='repayment_policies.weekly_tenure.max'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder='max'
-                                                    />
+                                                    <button
+                                                        className="flex items-center justify-center mt-1 w-8 h-8 bg-gray-100 border-0 border-gray-300 rounded-full hover:bg-gray-200 focus:outline-none"
+                                                        aria-label="Edit"
+                                                        onClick={() => document.getElementById('imageInput').click()}
+                                                    >
+                                                        <BiUpload className="text-gray-500 w-5 h-5 text-lg" />
+                                                    </button>
+                                                    <p className='text-xs mt-3 text-[#0A0F0C] font-[500]'>Product Image</p>
+                                                    {preview && (
+                                                        <img src={preview} alt="Uploaded Image" className='w-6 h-6 mt-2 rounded-md' />
+                                                    )}
+
                                                 </div>
                                             </div>
+
+
+                                        </div>
+                                        <div className='px-11 pb-5 flex gap-2'>
                                             <div>
-                                                <div className="mb-2 block">
-                                                    <Label className="text-[#212C25] text-xs font-[500]" htmlFor="description" value="Description" />
-                                                </div>
-                                                <textarea
-                                                    style={{ color: "#202224", borderRadius: "8px" }}
-                                                    value={product.repayment_policies.description ?? ""}
-                                                    name='repayment_policies.description'
-                                                    onChange={handleRepaymentPlanSelect}
-                                                    className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full h-40 resize-none"
-                                                    placeholder='Enter description'
+                                                <Button
+                                                    label="Upload"
+                                                    variant="solid"
+                                                    loading={isload}
+                                                    onClick={handleUpload}
+                                                    size="md"
+                                                    className="text-sm px-6 py-5"
                                                 />
                                             </div>
-                                        </div>
+                                            <div className='mb-7  px-11'>
+                                                <Button type="submit" size='lg' className="text-sm w-[150px]" label='Create Product' loading={loading} />
 
-                                        <div className="flex flex-col gap-4 w-full lg:w-1/2">
-                                            <div>
-                                                <div className="mb-2 block">
-                                                    <Label className="text-[#212C25] text-xs font-[500]" htmlFor="down_percentage" value="Down Percentage" />
-                                                </div>
-                                                <div className='flex gap-2'>
-                                                    <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        type="number"
-                                                        value={product.repayment_policies.down_percentage.min ?? ""}
-                                                        name='repayment_policies.down_percentage.min'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder=" min"
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                    />
-                                                    <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        type="number"
-                                                        value={product.repayment_policies.down_percentage.max ?? ""}
-                                                        name='repayment_policies.down_percentage.max'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder=" max"
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                    />
-                                                </div>
-                                            </div>
 
-                                            <div>
-                                                <div className="mb-2 block">
-                                                    <Label className="text-[#212C25] text-xs font-[500]" htmlFor="monthly_tenure" value="Monthly Tenure" />
-                                                </div>
-                                                <div className='flex gap-2'>
-                                                    <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        type="number"
-                                                        value={product.repayment_policies.monthly_tenure.min ?? ""}
-                                                        name='repayment_policies.monthly_tenure.min'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder=' min'
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                    />
-                                                    <input
-                                                        style={{ color: "#202224", borderRadius: "8px" }}
-                                                        type="number"
-                                                        value={product.repayment_policies.monthly_tenure.max ?? ""}
-                                                        name='repayment_policies.monthly_tenure.max'
-                                                        onChange={handleRepaymentPlanSelect}
-                                                        placeholder='max'
-                                                        className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                                                    />
-                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </Card>
+
+
+
+                                    </Card>
+
+                                </div>
                             </div>
 
 
 
-                            <div className='mb-7  px-11'>
-                                <Button type="submit" size='lg' className="text-sm w-[150px]" label='Create Product' loading={loading} />
 
 
-                            </div>
+
+
+
                         </div>
                     </form>
 
@@ -762,102 +759,7 @@ function Addproduct() {
             </div>
 
 
-            <div className='p-4'>
-                <Card className='w-full h-full bg-white'>
-                    <h3 className='p-3 px-11'>Upload Images</h3>
-                    <div className='w-full border-t-2 border-gray-200'></div>
-                    <div className='flex gap-10  py-5 px-11'>
-                        <div className='w-[17rem] flex gap-10 h-12 py-1 mt-4 px-4 rounded-md border-1 border-gray-200 shadow bg-white '>
 
-                            <div className='flex gap-2'>
-                                <input
-                                    type="file"
-                                    accept='image/*'
-                                    hidden
-                                    id="imageInput"
-                                    onChange={handleImageChange}
-                                />
-                                <button
-                                    className="flex items-center justify-center mt-1 w-8 h-8 bg-gray-100 border-0 border-gray-300 rounded-full hover:bg-gray-200 focus:outline-none"
-                                    aria-label="Edit"
-                                    onClick={() => document.getElementById('imageInput').click()}
-                                >
-                                    <BiUpload className="text-gray-500 w-5 h-5 text-lg" />
-                                </button>
-                                <p className='text-xs mt-3 text-[#0A0F0C] font-[500]'>Product Image</p>
-                                {preview && (
-                                    <img src={preview} alt="Uploaded Image" className='w-6 h-6 mt-2 rounded-md' />
-                                )}
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div className='px-11 pb-5'>
-                        <Button
-                            label="Upload"
-                            variant="solid"
-                            loading={isload}
-                            onClick={handleUpload}
-                            size="md"
-                            className="text-sm px-6 py-5"
-                        />
-
-                    </div>
-
-
-                </Card>
-
-            </div>
-            <div className='p-4'>
-                <Card className='w-full h-full bg-white'>
-                    <h3 className='p-3 px-11'>Upload Display Product Image</h3>
-                    <div className='w-full border-t-2 border-gray-200'></div>
-                    <div className='flex gap-10  py-5 px-11'>
-                        <div className='w-[17rem] flex gap-10 h-12 py-1 mt-4 px-4 rounded-md border-1 border-gray-200 shadow bg-white '>
-
-                            <div className='flex gap-2'>
-                                <input
-                                    type="file"
-                                    accept='image/*'
-                                    hidden
-                                    id="imageInputDisplay"
-                                    onChange={handleImageChangeDisplay}
-                                />
-                                <button
-                                    className="flex items-center justify-center mt-1 w-8 h-8 bg-gray-100 border-0 border-gray-300 rounded-full hover:bg-gray-200 focus:outline-none"
-                                    aria-label="Edit"
-                                    onClick={() => document.getElementById('imageInputDisplay').click()}
-                                >
-                                    <BiUpload className="text-gray-500 w-5 h-5 text-lg" />
-                                </button>
-                                <p className='text-xs mt-3 text-[#0A0F0C] font-[500]'>Product Image</p>
-                                {previews && (
-                                    <img src={previews} alt="Uploaded Image" className='w-6 h-6 mt-2 rounded-md' />
-                                )}
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div className='px-11 pb-5'>
-                        <Button
-                            label="Upload"
-                            variant="solid"
-                            loading={load}
-                            onClick={handleUploadDisplay}
-                            size="md"
-                            className="text-sm px-6 py-5"
-                        />
-
-                    </div>
-
-
-                </Card>
-
-            </div>
 
 
         </div>

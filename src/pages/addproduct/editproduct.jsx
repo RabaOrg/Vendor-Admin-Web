@@ -9,7 +9,7 @@ import { useFetchRepayment } from '../../hooks/queries/loan';
 
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
-import { useFetchCategory } from '../../hooks/queries/product';
+import { useFetchCat, useFetchCategory } from '../../hooks/queries/product';
 import { useParams } from 'react-router-dom'
 import { BiUpload } from 'react-icons/bi'
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,7 +30,8 @@ function EditProduct() {
 
   const { data: singleProduct } = useFetchSingleProduct(id)
   const Navigate = useNavigate()
-  const { data: category, isPending, isError } = useFetchCategory()
+  const { data: category, isPending, isError } = useFetchCat()
+  console.log(category)
   const [imageId, setImageId] = useState("")
   const [product, setProduct] = useState({
     id: id,
@@ -40,6 +41,9 @@ function EditProduct() {
     shipping_days_max: null,
     category_id: '',
     price: '',
+    stock: 0,
+    lease_eligibility: false,
+    featured: false,
     specifications: [],
     interest_rule: [],
     repayment_policies: {
@@ -60,6 +64,7 @@ function EditProduct() {
   const [newSpecificationKey, setNewSpecificationKey] = useState("");
   const queryClient = useQueryClient();
   const { data: repaymentPlan } = useFetchRepayment()
+  console.log(repaymentPlan)
   const [newSpecifications, setNewSpecifications] = useState([]);
   const [newSpecificationValue, setNewSpecificationValue] = useState("");
 
@@ -86,6 +91,9 @@ function EditProduct() {
         shipping_days_max: singleProduct.shipping_days_max ?? null,
         category_id: singleProduct.category_id || '',
         price: singleProduct.price || '',
+        stock: singleProduct.stock || 0,
+        featured: singleProduct.featured,
+        lease_eligibility: singleProduct.lease_eligibility,
         specifications: singleProduct.specifications || {},
         interest_rule: normalizedInterest,
         isArchived: singleProduct.is_archived,
@@ -407,6 +415,9 @@ function EditProduct() {
     const payload = {
       id: id,
       name: product.name || singleProduct?.name,
+      featured: product.featured,
+      lease_eligibility: product.lease_eligibility,
+      stock: product.stock,
       description: product.description || singleProduct?.description,
       shipping_days_min: Number(product.shipping_days_min) || singleProduct?.shipping_days_min,
       shipping_days_max: Number(product.shipping_days_max) || singleProduct?.shipping_days_max,
@@ -419,7 +430,6 @@ function EditProduct() {
         return acc;
       }, {}),
 
-      interest_rule: groupedInterest,
       repayment_policies: {
         description: product.repayment_policies.description,
         tenure_unit: "week",
@@ -445,7 +455,7 @@ function EditProduct() {
     console.log(payload);
 
     try {
-      const response = await handleUpdateProduct(payload);
+      const response = await handleUpdateProduct(id, payload);
       if (response.data) {
         setImageId(response.data.id);
         toast.success("Product updated successfully");
@@ -522,6 +532,23 @@ function EditProduct() {
                       onChange={handleInput}
                     />
                   </div>
+                  <div>
+                    <div className="mb-2 block">
+                      <Label className="text-[#212C25] text-xs font-[500]" htmlFor="price" value="Stock" />
+                    </div>
+
+                    <input
+                      style={{ color: "#202224", borderRadius: "8px" }}
+                      id="stock"
+                      className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                      type="number"
+
+                      defaultValue={singleProduct?.stock || product.stock}
+                      name='stock'
+                      onChange={handleInput}
+                    />
+                  </div>
+
                 </div>
                 <div className="flex flex-col gap-4 w-full lg:w-1/2">
                   <div>
@@ -552,7 +579,29 @@ function EditProduct() {
                       onChange={handleInput}
                     />
                   </div>
+
+
+
+
+                  <div>
+                    <div className="mb-2 block">
+                      <Label className="text-[#212C25] text-xs font-[500]" htmlFor="lease_eligibility" value="Lease Eligibility" />
+                    </div>
+                    <select
+                      style={{ color: "#202224", borderRadius: "8px" }}
+                      id="lease_eligibility"
+                      name="lease_eligibility"
+                      value={product.lease_eligibility ? 'true' : 'false'}
+                      onChange={handleInput}
+                      className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                    >
+                      <option value="true">Eligible</option>
+                      <option value="false">Not Eligible</option>
+                    </select>
+                  </div>
+
                 </div>
+
                 <div className="flex flex-col gap-4 w-full lg:w-1/2">
                   <div>
                     <div className="mb-2 block">
@@ -576,12 +625,28 @@ function EditProduct() {
                       ) : isError ? (
                         <option disabled>Error loading categories</option>
                       ) : (
-                        category?.map((cat) => (
+                        category?.data?.categories?.map((cat) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.name}
                           </option>
                         ))
                       )}
+                    </select>
+                  </div>
+                  <div>
+                    <div className="mb-2 block">
+                      <Label className="text-[#212C25] text-xs font-[500]" htmlFor="featured" value="Featured" />
+                    </div>
+                    <select
+                      style={{ color: "#202224", borderRadius: "8px" }}
+                      id="featured"
+                      name="featured"
+                      value={product.featured ? 'true' : 'false'}
+                      onChange={handleInput}
+                      className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                    >
+                      <option value="true">True</option>
+                      <option value="false">False</option>
                     </select>
                   </div>
                 </div>
@@ -757,115 +822,7 @@ function EditProduct() {
               </div>
 
 
-              <div className='p-4'>
-                <Card className='w-full h-full bg-white'>
-                  <div className='flex justify-between'>
-                    <h3 className='p-3 px-7 flex justify-between items-center'>
-                      <span className='font-semibold'>Update Product Interest Rate Rule</span>
-                    </h3>
-                    <button
-                      type="button"
-                      className="bg-[#0f5d30] text-white px-4 py-2 rounded"
-                      onClick={addInterestRule}
-                    >
-                      + Add Interest Rule
-                    </button></div>
-                  <div className='w-full border-t-2 border-gray-200'></div>
 
-                  {product.interest_rule.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">
-                      No product interval added yet
-                    </div>
-                  ) : (
-                    product.interest_rule.map((rule, index) => (
-                      <div key={index} className='flex flex-col lg:flex-row gap-12 px-7 pb-7 mt-4'>
-                        <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                          <div className="mb-2 block">
-                            <Label
-                              className="text-[#212C25] text-xs font-[500]"
-                              htmlFor={`interest-rule-interval-${index}`}
-                              value="Interval"
-                            />
-                          </div>
-                          <select
-                            style={{ color: "#202224", borderRadius: "8px" }}
-                            id={`interest-rule-interval-${index}`}
-                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                            name="interval"
-                            value={rule.interval || ''}
-                            onChange={(e) => handleChangeInterest(index, e)}
-                          >
-                            <option value="" disabled>Select interval</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                          </select>
-                        </div>
-                        <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                          <div className="mb-2 block">
-                            <Label
-                              className="text-[#212C25] text-xs font-[500]"
-                              htmlFor={`interest-rule-min-${index}`}
-                              value="Min"
-                            />
-                          </div>
-                          <input
-                            style={{ color: "#202224", borderRadius: "8px" }}
-                            id={`interest-rule-min-${index}`}
-                            type="number"
-                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                            name="min"
-                            value={rule.min || ''}
-                            onChange={(e) => handleChangeInterest(index, e)}
-                          />
-                        </div>
-                        <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                          <div className="mb-2 block">
-                            <Label
-                              className="text-[#212C25] text-xs font-[500]"
-                              htmlFor={`interest-rule-rate-${index}`}
-                              value="Rate"
-                            />
-                          </div>
-                          <input
-                            style={{ color: "#202224", borderRadius: "8px" }}
-                            id={`interest-rule-rate-${index}`}
-                            type="number"
-                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                            name="rate"
-                            value={rule.rate || ''}
-                            onChange={(e) => handleChangeInterest(index, e)}
-                          />
-                        </div>
-                        <div className="flex flex-col gap-4 w-full lg:w-1/3">
-                          <div className="mb-2 block">
-                            <Label
-                              className="text-[#212C25] text-xs font-[500]"
-                              htmlFor={`interest-rule-max-${index}`}
-                              value="Max"
-                            />
-                          </div>
-                          <input
-                            style={{ color: "#202224", borderRadius: "8px" }}
-                            id={`interest-rule-max-${index}`}
-                            type="number"
-                            className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
-                            name="max"
-                            value={rule.max || ''}
-                            onChange={(e) => handleChangeInterest(index, e)}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeInterestRule(index)}
-                          className="text-red-500 hover:text-red-700 mt-3 flex items-center gap-2"
-                        >
-                          <FaMinus /> Remove
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </Card>
-              </div>
 
 
 
@@ -897,7 +854,7 @@ function EditProduct() {
                           ) : isError ? (
                             <option disabled>Error loading categories</option>
                           ) : (
-                            repaymentPlan?.map((cat) => (
+                            repaymentPlan?.data?.repayment_plans?.map((cat) => (
                               <option key={cat.id} value={cat.id}>
                                 {cat.tenure_unit}
                               </option>

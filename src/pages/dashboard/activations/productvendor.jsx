@@ -1,32 +1,18 @@
-import React, { useState } from 'react'
-import { useFetchVendorData } from '../../../hooks/queries/loan'
-import { Link } from 'react-router-dom'
-import { FaEye, } from 'react-icons/fa'
-import Button from '../../../components/shared/button'
-import { useNavigate } from 'react-router-dom'
-import ApplicationList from '../application/application'
-import { FaBox } from 'react-icons/fa'
+import React from 'react'
+import { useFetchProductVendor } from '../../../hooks/queries/product';
+import { useParams } from 'react-router-dom';
+import { useState } from 'react';
 
-function ActivationLists() {
+
+function ProductVendor() {
+  const { id } = useParams()
   const [page, setPage] = useState(1);
-  const { data: activationList, isPending, isError } = useFetchVendorData({ page, limit: 10 })
+  const { data: activationList, isPending, isError } = useFetchProductVendor(id)
   console.log(activationList)
   const [selectedId, setSelectedId] = useState(null);
-  const Navigate = useNavigate()
 
-  const handleRowClick = (id) => {
 
-    setSelectedId(id);
 
-    Navigate(`/view_activation/${id}`);
-
-  };
-  const handleViewCustomer = (id) => {
-    Navigate(`/view_activation/${id}`)
-  }
-  const handleViewProduct = (id) => {
-    Navigate(`/product_vendor/${id}`)
-  }
   if (isPending)
     return (
       <div className="flex justify-center items-center h-screen text-xl">
@@ -39,7 +25,7 @@ function ActivationLists() {
         Error loading application.
       </div>
     );
-  if (!activationList)
+  if (!activationList.data)
     return (
       <div className="flex justify-center items-center h-screen text-xl">
         No vendor data found.
@@ -51,15 +37,8 @@ function ActivationLists() {
 
       <div className="inline-block min-w-full  rounded-lg overflow-hidden">
         <div className="flex items-center justify-between p-4 mt-3">
-          <h1 className="text-[30px] font-semibold text-black mt-6 mb-4 ">Vendor Management</h1>
-          <Link to={"/vendor_statistics"}>
-            <Button
-              label="View Vendor statistics"
-              variant="solid"
-              size="md"
-              className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
-            />
-          </Link>
+          <h1 className="text-[30px] font-semibold text-black mt-6 mb-4 ">Vendor Product</h1>
+
         </div>
         <table className="min-w-full leading-normal">
           <thead className="bg-[#D5D5D5]">
@@ -71,21 +50,21 @@ function ActivationLists() {
               <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">Monthly Revenue</th>
               <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">CAC Number</th>
               <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">Account Status</th>
-              <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">Product View</th>
-              <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">Vendor View</th>
             </tr>
           </thead>
 
           <tbody>
-            {Array.isArray(activationList?.data?.data) &&
-              activationList.data.data.map((item) => (
+            {Array.isArray(activationList?.data) && activationList.data.length > 0 ? (
+              activationList.data.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => handleRowClick(item.id)}
                   className={`cursor-pointer transition-all duration-200 ${selectedId === item.id ? 'bg-blue-200' : 'bg-white'
                     } hover:bg-gray-200`}
                 >
-                  <td className="px-4 py-4 border-b border-gray-200 text-xs">{item.first_name} {item.last_name}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-xs">
+                    {item.first_name} {item.last_name}
+                  </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-xs">{item.business_name}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-xs">{item.email}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-xs">{item.business_category}</td>
@@ -115,34 +94,17 @@ function ActivationLists() {
                       {item.account_status}
                     </button>
                   </td>
-                  <td className="px-4 py-4 border-b border-gray-200">
-                    <button
-                      className="flex items-center justify-center w-12 h-10 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none"
-                      aria-label="View Product"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewProduct(item.id);
-                      }}
-                    >
-                      <FaBox className="text-gray-500 text-lg" />
-                    </button>
-                  </td>
-                  <td className="px-4 py-4 border-b border-gray-200">
-                    <button
-                      className="flex items-center justify-center w-12 h-10 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none"
-                      aria-label="View"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewCustomer(item.id);
-                      }}
-                    >
-                      <FaEye className="text-gray-500 text-lg" />
-                    </button>
-                  </td>
-
                 </tr>
-              ))}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="text-center py-4 text-gray-500">
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
+
         </table>
 
 
@@ -178,4 +140,4 @@ function ActivationLists() {
   )
 }
 
-export default ActivationLists
+export default ProductVendor

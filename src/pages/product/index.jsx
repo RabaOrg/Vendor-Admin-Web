@@ -2,12 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { FaSearch, FaEdit, FaEye } from 'react-icons/fa';
 import axiosInstance from '../../../store/axiosInstance';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Button from '../../components/shared/button';
+import { useQueryClient } from "@tanstack/react-query";
+import { handleArchive, handleDeletePro } from '../../services/product';
+import { FaTrash } from 'react-icons/fa';
+import { FaUndo } from 'react-icons/fa';
+import { FaArchive } from 'react-icons/fa';
 
 function Product() {
     const [currentPage, setCurrentPage] = useState(1);
+    const [loadingArchiveId, setLoadingArchiveId] = useState(null);
     const [allProducts, setAllProducts] = useState([]);
     const [product, setProduct] = useState([]);
+    const queryClient = useQueryClient();
     const [productMeta, setMetaProduct] = useState([]);
     const itemsPerPage = 10;
     const [search, setSearch] = useState("");
@@ -35,7 +43,16 @@ function Product() {
             setProduct(filteredProducts);
         }
     };
-
+    const handleDelete = async (id) => {
+        try {
+            const response = await handleDeletePro(id)
+            if (response) {
+                toast.success("Product deleted successfully")
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const handleNextPage = () => {
         if (currentPage < productMeta?.meta?.total_pages) {
             setCurrentPage(currentPage + 1);
@@ -47,11 +64,26 @@ function Product() {
             setCurrentPage(currentPage - 1);
         }
     };
+    const toggleArchive = async (id, isArchived) => {
+        try {
+            setLoadingArchiveId(id);
+            const formInfo = { is_archived: !isArchived };
+            await handleArchive(id, formInfo);
+
+            toast.success(isArchived ? "Product unarchived" : "Product archived");
+
+            queryClient.invalidateQueries(["SingleProduct", id]);
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoadingArchiveId(null);
+        }
+    };
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axiosInstance.get(`admin/products?page=${currentPage}&perPage=${itemsPerPage}`);
+                const response = await axiosInstance.get(`/api/admin/products?limit=${itemsPerPage}&page=${currentPage}&search=${search}`);
                 console.log(response);
                 setAllProducts(response.data.data);
                 setProduct(response.data.data);
@@ -89,12 +121,21 @@ function Product() {
                             className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
                         />
                     </Link>
+                    <Link to={"/product_statistics"}>
+                        <Button
+                            label="View Product Statistics"
+                            variant="solid"
+                            size="md"
+                            className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 mt-4 md:mt-0"
+                        />
+                    </Link>
                 </div>
 
                 <div className="overflow-x-auto hidden md:block">
                     <table className="min-w-full leading-normal rounded-md rounded-t-md border-gray-200">
                         <thead>
                             <tr>
+                                <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black tracking-wider">Id</th>
                                 <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black tracking-wider">Image</th>
                                 <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black tracking-wider">Product Name</th>
                                 <th className="px-4 py-4 w-1/6 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black tracking-wider">Category</th>
@@ -106,10 +147,13 @@ function Product() {
                         <tbody>
                             {Array.isArray(product) && product.length > 0 ? (
                                 product.map((item) => {
-                                    const { id, display_attachment_url, name, price, category,
+                                    const { id, display_attachment_url, name, price, category_id,
                                         is_archived } = item;
                                     return (
                                         <tr className="bg-white" key={id}>
+                                            <td className="px-4 py-4 border-b border-gray-200 bg-white text-xs">
+                                                <p className="font-[500] whitespace-no-wrap">{id}</p>
+                                            </td>
                                             <td className="px-4 py-4 border-b border-gray-200 bg-white text-xs">
                                                 <img className="w-11 h-11" src={display_attachment_url?.url} alt="Product" />
                                             </td>
@@ -117,7 +161,7 @@ function Product() {
                                                 <p className="font-[500] whitespace-no-wrap">{name}</p>
                                             </td>
                                             <td className="px-4 py-4 border-b border-gray-200 bg-white text-xs">
-                                                <p className="font-[500] whitespace-no-wrap">{category}</p>
+                                                <p className="font-[500] whitespace-no-wrap">{category_id}</p>
                                             </td>
                                             <td className="px-4 py-4 border-b border-gray-200 bg-white text-xs">
                                                 <p className="font-[500] whitespace-no-wrap">{price}</p>
@@ -133,7 +177,7 @@ function Product() {
                                                     <span className="relative text-[#00B69B]">Active</span>
                                                 </span>
                                             </td>}
-                                            <td className="px-7 py-4 border-b  gap-2 border-gray-200 bg-white flex justify-center">
+                                            <td className="px-7 py-4 border-b gap-2 border-gray-200 bg-white flex justify-center">
                                                 <button
                                                     className="flex items-center justify-center w-12 h-10 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none"
                                                     aria-label="View"
@@ -148,7 +192,32 @@ function Product() {
                                                 >
                                                     <FaEdit className="text-gray-500 text-lg" />
                                                 </button>
+                                                <button
+                                                    className="flex items-center justify-center w-12 h-10 bg-red-100 border border-red-300 rounded-lg hover:bg-red-200 focus:outline-none"
+                                                    aria-label="Delete"
+                                                    onClick={() => handleDelete(id)}
+                                                >
+                                                    <FaTrash className="text-red-500 text-lg" />
+                                                </button>
+                                                <button
+                                                    className={`flex items-center justify-center w-12 h-10 ${is_archived
+                                                        ? "bg-green-100 border border-green-300 hover:bg-green-200"
+                                                        : "bg-yellow-100 border border-yellow-300 hover:bg-yellow-200"
+                                                        } rounded-lg focus:outline-none`}
+                                                    aria-label={is_archived ? "Unarchive" : "Archive"}
+                                                    onClick={() => toggleArchive(id, is_archived)}
+                                                    disabled={loadingArchiveId === id}
+                                                >
+                                                    {loadingArchiveId === id ? (
+                                                        <span className="text-sm text-gray-500">...</span>
+                                                    ) : is_archived ? (
+                                                        <FaUndo className="text-green-600 text-lg" />
+                                                    ) : (
+                                                        <FaArchive className="text-yellow-600 text-lg" />
+                                                    )}
+                                                </button>
                                             </td>
+
                                         </tr>
                                     );
                                 })

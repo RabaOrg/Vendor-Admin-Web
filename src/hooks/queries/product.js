@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { handleGetCategories, handleGetSingleProduct, handleMetaProduct, handleProduct,handleProductBulk  } from "../../services/product";
+import { handleGetCat, handleGetCategories, handleGetSingleProduct, handleMetaProduct, handleProduct,handleProductBulk, handleProductStatistics, handleProductVendor  } from "../../services/product";
 
 export const useFetchProduct = (page, perPage) => {
   return useQuery({
@@ -18,6 +18,24 @@ export const useFetchBulkDownload = () => {
   return useQuery({
     queryFn: handleProductBulk,
     queryKey: ["ProductBulk"]
+  });
+};
+export const useFetchCat = () => {
+  return useQuery({
+    queryFn: handleGetCat,
+    queryKey: ["Category"]
+  });
+};
+export const useFetchProductVendor = (id) => {
+  return useQuery({
+    queryFn: () => handleProductVendor(id),
+    queryKey: ["ProductVendor", id]
+  });
+};
+export const useFetchProductStat = () => {
+  return useQuery({
+    queryFn: handleProductStatistics,
+    queryKey: ["productStat"]
   });
 };
 
