@@ -22,6 +22,7 @@ function CreateSmsApplication() {
       product_name: "",
       product_price: "",
       custom_message: "",
+      email: "",
     },
     validationSchema: Yup.object({
       vendor_id: Yup.string().required("Vendor ID is required"),
@@ -29,6 +30,7 @@ function CreateSmsApplication() {
       product_name: Yup.string().required("Product name is required"),
       product_price: Yup.string().required("Product price is required"),
       custom_message: Yup.string().required("Custom message is required"),
+      email: Yup.string().required("Email is required"),
     }),
     onSubmit: async (values) => {
       onMutate(values);
@@ -136,6 +138,25 @@ function CreateSmsApplication() {
                 />
                 {formik.touched.product_name && formik.errors.product_name && (
                   <small className="text-red-500">{formik.errors.product_name}</small>
+                )}
+              </div>
+              <div>
+                <Label
+                  className="text-[#212C25] text-xs font-[500] mb-2 block"
+                  htmlFor="product_name"
+                  value="Email"
+                />
+                <input
+                  type="text"
+                  name="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className="bg-white text-sm p-3 text-gray-700 border border-[#A0ACA4] rounded-md focus:ring-2 focus:ring-[#0f5d30] focus:outline-none w-full"
+                  placeholder="Enter  Email"
+                />
+                {formik.touched.email && formik.errors.email && (
+                  <small className="text-red-500">{formik.errors.email}</small>
                 )}
               </div>
 
