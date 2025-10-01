@@ -91,7 +91,7 @@ function ApplicationList() {
           </Link>
 
         </div>
-        <table className="min-w-full leading-normal mt-3">
+        <table className="table-auto leading-normal mt-3">
           <thead className="bg-[#D5D5D5]">
             <tr>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">
@@ -122,7 +122,7 @@ function ApplicationList() {
                 Edit
               </th>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">
-                View Application
+                View App
               </th>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-white text-left text-xs font-bold text-black uppercase tracking-wider">
                 View Payment
@@ -139,25 +139,25 @@ function ApplicationList() {
                     } hover:bg-gray-200`}
                 >
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">{item.id}</p>
+                    <p className="font-medium whitespace-normal text-xs">{item.id}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">{item.vendor?.name || '—'}</p>
+                    <p className="font-medium whitespace-normal text-xs">{item.vendor?.name || '—'}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">{item.customer?.name || '—'}</p>
+                    <p className="font-medium whitespace-normal text-xs">{item.customer?.name || '—'}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">₦{Number(item.amount).toLocaleString()}</p>
+                    <p className="font-medium whitespace-normal text-xs">₦{Number(item.amount).toLocaleString()}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">{item.application_type}</p>
+                    <p className="font-medium whitespace-normal text-xs">{item.application_type}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">{item.down_payment_amount ?? '—'}</p>
+                    <p className="font-medium whitespace-normal text-xs">{item.down_payment_amount ?? '—'}</p>
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
-                    <p className="font-medium whitespace-no-wrap text-xs">
+                    <p className="font-medium whitespace-normal text-xs">
                       {new Date(item.created_at).toLocaleDateString()}
                     </p>
                   </td>
@@ -165,7 +165,7 @@ function ApplicationList() {
 
                   <td className="px-5 py-5 border-b border-gray-200 text-xs">
                     <button
-                      className={`font-medium whitespace-no-wrap text-xs px-3 py-1 rounded ${item.status === 'approved'
+                      className={`font-medium whitespace-normal text-xs px-3 py-1 rounded ${item.status === 'approved'
                         ? 'bg-[#ccf0eb] text-[#00B69B]'
                         : item.status === 'pending'
                           ? 'bg-orange-100 text-[#FFA756]'
