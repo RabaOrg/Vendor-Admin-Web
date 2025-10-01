@@ -469,11 +469,11 @@ function SingleApplication() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Lease Time Months</label>
+                <label className="block text-sm text-gray-600 mb-1">Lease Tenure Unit</label>
                 <input
                   type="text"
                   disabled
-                  value={application_data?.calculation_breakdown?.lease_time_months}
+                  value={singleLoan?.lease_tenure_unit}
 
                   className="w-full p-3 border border-[#A0ACA4] rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0f5d30]"
                 />

@@ -94,22 +94,22 @@ function TransactionDetails() {
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200  text-xs">
                   <p className="font-[500] whitespace-no-wrap text-xs">
-                    {item.customer_name}
+                    {item.customer.name}
                   </p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200  text-xs">
                   <p className="font-[500] whitespace-no-wrap text-xs">
-                    {item.vendor_name}
+                    {item.vendor.name}
                   </p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200  text-xs">
                   <p className="font-[500] whitespace-no-wrap text-xs">
-                    {new Date(item.created_at).toLocaleDateString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200  text-xs">
                   <p className="font-[500] whitespace-no-wrap text-xs">
-                    {item.transaction_type}
+                    {item.type}
                   </p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 text-xs">

@@ -6,21 +6,20 @@ import axiosInstance from './axiosInstance';
 export const useAuthStore = create(
   persist(
     (set) => ({
-     
-     isLoggedIn: false,
-          token: null,
-          login: (token) => set({ isLoggedIn: true, token}),
-          logOut: () => set({ isLoggedIn: false, token: null }),
-
-   
-      }),
-    
+      isLoggedIn: false,
+      token: null,
+      user: null,
+      login: (token, user) => set({ isLoggedIn: true, token, user }),
+      logOut: () => set({ isLoggedIn: false, token: null, user: null }),
+    }),
     {
-      name: 'auth-storage', 
-      storage: createJSONStorage(() => sessionStorage), 
-    },
-  ),
-)
+      name: "auth-storage",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);
+
+
 //  createCustomers: async (credentials) => {
 //         set({ loading: true, error: null });
 //         try {

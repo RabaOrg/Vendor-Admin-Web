@@ -41,7 +41,7 @@ function Login() {
 
             console.log(data)
             console.log(data.data.token)
-            login(data.data.token)
+            login(data.data.token, data.data.admin)
             Navigate("/")
             toast.success(data.message)
         } catch (error) {
