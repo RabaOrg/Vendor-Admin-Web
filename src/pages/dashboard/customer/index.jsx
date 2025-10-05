@@ -40,6 +40,7 @@ function Customer() {
 
     return (
         <div className="px-6">
+
             <div className="inline-block min-w-full rounded-lg overflow-hidden">
                 <div className="flex justify-between flex-col md:flex-row w-full gap-4 py-6">
                     <h1 className="text-3xl font-semibold text-black mb-4 md:mb-0">Customer</h1>

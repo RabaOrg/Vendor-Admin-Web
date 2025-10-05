@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Button from '../../../components/shared/button'
 
+
 import axiosInstance from '../../../../store/axiosInstance';
 import { handleDeleteApplication, handleDeleteGuarantorApplication, handleUpdateGuarantorStatus, handleUpdateStatus } from '../../../services/loans';
 import { useFetchSingleGuarantor } from "../../../hooks/queries/loan"
@@ -13,10 +14,12 @@ import { useFetchSingleGuarantor } from "../../../hooks/queries/loan"
 function ViewGuarantor() {
   const { id } = useParams();
   const Navigate = useNavigate()
+
   const [loanData, setLoanData] = useState(null);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false)
   const { data: singleGuarantor, isPending, isError } = useFetchSingleGuarantor(id);
+
   const [showPreview, setShowPreview] = useState(false);
   const [bankId, setBankId] = useState('')
   const [selectedStatus, setSelectedStatus] = useState(singleGuarantor?.data?.verification_status || "");
@@ -81,6 +84,9 @@ function ViewGuarantor() {
         No application data found.
       </div>
     );
+  const handleEdit = () => {
+    Navigate(`/edit_guarantor/${id}`)
+  }
   const handleUpdateLoanStatus = async () => {
     if (selectedStatus === singleGuarantor?.status) {
       toast.error("Please select a different status to update");
@@ -152,7 +158,16 @@ function ViewGuarantor() {
 
   return (
     <div className="max-w-6xl mx-auto p-10">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className='flex justify-end'>
+        <Button
+          label="Edit Guarantor"
+          onClick={handleEdit}
+          variant="outline"
+          size="sm"
+          className="px-4 py-2 text-sm"
+        />
+      </div>
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-2">
         <div className="p-6 border-b flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <h2 className="text-3xl font-bold text-gray-800">
             View Guarantor Details ({singleGuarantor?.data?.name})

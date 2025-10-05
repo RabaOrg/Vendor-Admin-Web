@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useFetchSingleLoan } from '../../../../hooks/queries/loan';
 import Button from '../../../../components/shared/button';
 import axiosInstance from '../../../../../store/axiosInstance';
-import { handleDeleteApplication, handleUpdateStatus } from '../../../../services/loans';
+import { handleDeleteApplication, handleRestoreApplication, handleUpdateStatus } from '../../../../services/loans';
 
 function SingleApplication() {
   const { id } = useParams();
@@ -17,6 +17,7 @@ function SingleApplication() {
   const { data: singleLoan, isPending, isError } = useFetchSingleLoan(id);
   const [showPreview, setShowPreview] = useState(false);
   const [bankId, setBankId] = useState('')
+  const [isloads, setIsLoads] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
@@ -30,6 +31,9 @@ function SingleApplication() {
   const handleChangeStatus = (e) => {
     setSelectedStatus(e.target.value);
   };
+  const handleEdit = () => {
+    Navigate(`/edit_application/${id}`)
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,6 +51,24 @@ function SingleApplication() {
 
     fetchData();
   }, [id]);
+  const handleRes = async () => {
+    setIsLoads(true);
+    try {
+      const response = await handleRestoreApplication(id);
+
+
+      if (response.status === "error") {
+        toast.error(response.message);
+      } else {
+        toast.success("Application restored successfully");
+      }
+    } catch (error) {
+
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setIsLoads(false);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -155,19 +177,31 @@ function SingleApplication() {
 
   return (
     <div className="max-w-6xl mx-auto p-10">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className='flex justify-end'>
+        <Button
+          label="Edit Application"
+          onClick={handleEdit}
+          variant="outline"
+          size="sm"
+          className="px-4 py-2 text-sm"
+        />
+      </div>
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-2">
+
         <div className="p-6 border-b flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <h2 className="text-3xl font-bold text-gray-800">
             View Application Details ({Customer?.full_name})
           </h2>
-          <span
-            className={`inline-block px-4 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${getStatusBadgeClasses(
-              status
-            )}`}
-          >
-            {status}
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              className={`inline-block px-4 py-1 text-sm font-semibold rounded-full transition-colors duration-200 ${getStatusBadgeClasses(status)}`}
+            >
+              {status}
+            </span>
+
+          </div>
         </div>
+
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -249,25 +283,17 @@ function SingleApplication() {
                 <input
                   type="text"
                   disabled
-                  value={Product?.id}
+                  value={singleLoan?.id}
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Category</label>
-                <input
-                  type="text"
-                  disabled
-                  value={Product?.category}
-                  className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Description</label>
                 <input
                   type="text"
                   disabled
-                  value={Product?.description}
+                  value={singleLoan?.application_data?.product_description}
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -276,7 +302,8 @@ function SingleApplication() {
                 <input
                   type="text"
                   disabled
-                  value={Product?.name}
+                  value={singleLoan?.application_data?.product_name}
+
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -285,25 +312,18 @@ function SingleApplication() {
                 <input
                   type="text"
                   disabled
-                  value={Product?.price}
+                  value={singleLoan?.application_data?.product_price}
+
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Shipping_days_min</label>
+                <label className="block text-sm text-gray-600 mb-1">Updated at</label>
                 <input
                   type="text"
                   disabled
-                  value={Product?.shipping_days_min}
-                  className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Shipping_days_max</label>
-                <input
-                  type="text"
-                  disabled
-                  value={Product?.shipping_days_max}
+                  value={new Date(singleLoan?.updated_at).toLocaleDateString()}
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -313,7 +333,7 @@ function SingleApplication() {
                 <input
                   type="text"
                   disabled
-                  value={Product?.status}
+                  value={singleLoan?.status}
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -650,7 +670,7 @@ function SingleApplication() {
 
         </div>
 
-        <div className="p-6 flex justify-items-end gap-10">
+        <div className="p-6 flex justify-end gap-10">
           <Button
             label="Update Status"
             onClick={handleUpdateLoanStatus}
@@ -664,10 +684,19 @@ function SingleApplication() {
             onClick={handleDelete}
             variant="transparent"
             size="md"
-            className="text-sm px-6 py-3"
+            className="text-sm px-6 py-3 text-red-600 hover:text-red-800"
+            loading={isLoading}
+          />
+          <Button
+            label="Restore Application"
+            onClick={handleRes}
+            variant="outline"
+            size="md"
+            className="text-sm px-6 py-3 text-green-600 border-green-600 hover:bg-green-50"
             loading={isLoading}
           />
         </div>
+
       </div>
     </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { Card, Label } from 'flowbite-react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../../components/shared/button'
@@ -60,6 +60,9 @@ function ViewActivation() {
       setIsLoading(false)
     }
 
+  }
+  const handleEdit = () => {
+    navigate(`/edit_vendor/${id}`)
   }
   const handleUpdateVerificationStatus = async () => {
     if (!interest) {
@@ -138,7 +141,17 @@ function ViewActivation() {
   };
   return (
     <div className="px-6">
-      <div className="min-w-full rounded-lg overflow-hidden bg-white shadow-md">
+      <div className='flex justify-end mt-2'>
+        <Button
+          label="Edit Vendor"
+          onClick={handleEdit}
+          variant="outline"
+          size="sm"
+          className="px-4 py-2 text-sm"
+        />
+      </div>
+      <div className="min-w-full rounded-lg overflow-hidden bg-white shadow-md mt-2">
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 border-b">
           <h2 className="text-3xl font-bold text-gray-800">
             Vendor Details ({vendor?.full_name})
@@ -245,6 +258,14 @@ function ViewActivation() {
                 value={interest}
                 type="number"
                 onChange={(e) => setInterest(e.target.value)}
+              />
+              <Button
+                label="Update Interest Rate"
+                onClick={handleUpdateVerificationStatus}
+                variant="solid"
+                size="md"
+                className="text-sm px-6 py-3"
+                loading={isLoad}
               />
 
             </div>

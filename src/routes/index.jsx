@@ -49,6 +49,11 @@ import SingleTransaction from "../pages/dashboard/transactiondetails/singletrans
 import TransactionStatistics from "../pages/dashboard/transactiondetails/transactionstats";
 import ProductStats from "../pages/product/productstat/statistics";
 import ProductVendor from "../pages/dashboard/activations/productvendor";
+import EditApplication from "../pages/dashboard/application/editapplication/editapplication";
+import EditCustomer from "../pages/dashboard/customer/editcustomer";
+import EditCustomerApplication from "../pages/dashboard/customer/editcustomerapplication/editcustomerapplication";
+import EditGuarantorApplication from "../pages/dashboard/guarantor/editguarantor/editguarantorapplication";
+import EditVendor from "../pages/dashboard/activations/editvendor/editvendor";
 
 
 
@@ -76,6 +81,7 @@ export const router = createBrowserRouter([
                 element: <Customer />
 
             },
+
             {
                 path: "/customer",
                 element: <Customer />
@@ -105,6 +111,16 @@ export const router = createBrowserRouter([
             {
                 path: "/product",
                 element: <Product />
+
+            },
+            {
+                path: "/edit_customers/:id",
+                element: <EditCustomerApplication />
+
+            },
+            {
+                path: "/edit_guarantor/:id",
+                element: <EditGuarantorApplication />
 
             },
             {
@@ -183,8 +199,18 @@ export const router = createBrowserRouter([
 
             },
             {
+                path: "/edit_application/:id",
+                element: <EditApplication />
+
+            },
+            {
                 path: "/create_repayment_plan",
                 element: <RepaymentPlan />
+
+            },
+            {
+                path: "/edit_vendor/:id",
+                element: <EditVendor />
 
             },
             {

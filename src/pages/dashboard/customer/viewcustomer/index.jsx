@@ -2,12 +2,14 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
 import Button from '../../../../components/shared/button'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useFetchVendorCustomer } from '../../../../hooks/queries/customer'
 import { handleDeleteCustomer, handleUpdateCustomerStatus } from '../../../../services/loans'
 
 function ViewCustomerDetails() {
   const { id } = useParams()
+  const Navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [isLoad, setIsLoad] = useState(false)
   const { data: oneCustomer, isPending, isError } = useFetchVendorCustomer(id)
@@ -43,6 +45,9 @@ function ViewCustomerDetails() {
       setIsLoading(false)
     }
 
+  }
+  const handleEdit = () => {
+    Navigate(`/edit_customers/${id}`)
   }
   const handleDelete = async () => {
     setIsLoad(true)
@@ -90,7 +95,17 @@ function ViewCustomerDetails() {
   const { statistics, } = oneCustomer
   return (
     <div className="px-6">
+
       <div className="inline-block min-w-full rounded-lg overflow-hidden">
+        <div className='flex justify-end mt-2'>
+          <Button
+            label="Edit Customer"
+            onClick={handleEdit}
+            variant="outline"
+            size="sm"
+            className="px-4 py-2 text-sm"
+          />
+        </div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 border-b">
           <h2 className="text-3xl font-bold text-gray-800">

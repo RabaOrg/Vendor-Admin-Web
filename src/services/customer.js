@@ -20,7 +20,18 @@ export const handleFinancialDetailsForm = async (Id, formInfo) => {
     formInfo
   );
 };
-
+export const handleDeleteCustomer= async (id, forminfo) => {
+  const { data } = await axiosInstance.delete(`/api/admin/applications/${id}/soft-delete`, {
+         data: forminfo,
+     });
+     
+    return data.data
+}
+export const handleRestoreCustomer= async (id) => {
+  const { data } = await axiosInstance.patch(`/api/admin/customers/${id}/restore`);
+     
+    return data.data
+}
 export const handleGuarantorDetailsForm = async (Id ,formInfo) => {
   return axiosInstance.post(
    `/admin/add-guarantor/${Id}`,
@@ -103,6 +114,45 @@ export const handleEditGuarantorDetails = async (Id, Gid, payload) => {
     return data
 }
 
+export const handleDeleteGuarantor= async (id, forminfo) => {
+  const { data } = await axiosInstance.delete(`/api/admin/guarantors/${id}/soft-delete`, {
+         data: forminfo,
+     });
+     
+    return data.data
+}
+export const handleRestoreGuarantor= async (id) => {
+  const { data } = await axiosInstance.patch(`/api/admin/guarantors/${id}/restore`);
+     
+    return data.data
+}
 
+export const handleEditGuarantorsApp = async (id, info) => {
+  const { data } = await axiosInstance.put(`/api/admin/guarantors/${id}`, {
+    data: info
+  });
+     
+  return data.data
+}
 
+export const handleDeleteVendor= async (id, forminfo) => {
+  const { data } = await axiosInstance.delete(`/api/admin/vendors/${id}/soft-delete`, {
+         data: forminfo,
+     });
+     
+    return data.data
+}
+export const handleRestoreVendor= async (id) => {
+  const { data } = await axiosInstance.patch(`/api/admin/vendors/${id}/restore`);
+     
+    return data.data
+}
+
+export const handleEditVendorApp = async (id, info) => {
+  const { data } = await axiosInstance.put(`/api/admin/vendors/${id}`, {
+    data: info
+  });
+     
+  return data.data
+}
 

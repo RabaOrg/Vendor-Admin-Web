@@ -10,12 +10,25 @@ export const handleGetRepayment = async () => {
     return data
 }
 export const handleDeleteApplication= async (id, forminfo) => {
-  const { data } = await axiosInstance.delete(`/api/admin/applications/${id}`, {
+  const { data } = await axiosInstance.delete(`/api/admin/applications/${id}/soft-delete`, {
          data: forminfo,
      });
      
     return data.data
 }
+export const handleDeleteHardApplication= async (id, forminfo) => {
+  const { data } = await axiosInstance.delete(`/api/admin/applications/${id}/soft-delete`, {
+         data: forminfo,
+     });
+     
+    return data.data
+}
+export const handleRestoreApplication = async (id) => {
+  const { data } = await axiosInstance.patch(`/api/admin/applications/${id}/restore`);
+     
+    return data.data
+}
+
 export const handleDeleteGuarantorApplication= async (id, forminfo) => {
   const { data } = await axiosInstance.delete(`/admin/guarantors/${id}`, {
          data: forminfo,
@@ -83,6 +96,18 @@ export const handleGetBankStatement = async (id) => {
 }
 export const handleGetSingleLoan = async (id) => {
   const { data } = await axiosInstance.get(`/api/admin/applications/${id}`)
+  return data.data;
+}
+export const handleEditApplication = async (id, forminfo) => {
+  const { data } = await axiosInstance.put(`/api/admin/applications/${id}`, {
+    data:forminfo
+  })
+  return data.data;
+}
+export const handleEditCustomerApp = async (id, forminfo) => {
+  const { data } = await axiosInstance.put(`/api/admin/customers/${id}`, {
+    data:forminfo
+  })
   return data.data;
 }
 export const handleGetActivation = async () => {
