@@ -37,30 +37,18 @@ function ApplicationList() {
   const handleUpdateApplication = async () => {
     try {
 
-      if (editData.amount !== undefined) {
-        await axiosInstance.patch(`/api/admin/applications/${editData.id}/product-price`, {
-          newProductPrice: editData.amount
-        });
-      }
-      toast.success("Product Price updated successfully")
-
 
       if (editData.monthly_repayment !== undefined) {
-        await axiosInstance.patch(`/api/admin/applications/${editData.id}/financing-data`, {
+        await axiosInstance.patch(`/api/admin/applications/${editData.id}/product-price`, {
           newMonthlyRepayment: Number(editData.monthly_repayment),
+          newProductPrice: Number(editData.amount),
           newInterestRate: Number(editData.interest_rate),
-          newLeaseTenure: Number(editData.lease_tenure),
-          newLeaseTenureUnit: editData.lease_tenure_unit,
+
           newDownPaymentAmount: Number(editData.down_payment_amount)
 
         });
       }
-      toast.success("Financial data updated successfully")
-      if (editData.down_payment_amount !== undefined) {
-        await axiosInstance.patch(`/api/admin/applications/${editData.id}/financing`, {
-          newDownPaymentAmount: editData.down_payment_amount
-        });
-      }
+
 
 
 
@@ -70,7 +58,7 @@ function ApplicationList() {
 
     } catch (error) {
       console.error('Error updating application:', error);
-
+      toast.error('Failed to update application. Please try again.');
     }
   }
 
@@ -310,23 +298,6 @@ function ApplicationList() {
               className="border p-2 w-full mb-3"
             />
 
-            <label>Lease Tenure</label>
-            <input
-              type="number"
-              value={editData.lease_tenure || ''}
-              onChange={(e) => setEditData({ ...editData, lease_tenure: e.target.value })}
-              className="border p-2 w-full mb-3"
-            />
-
-            <label>Lease Tenure Unit</label>
-            <select
-              value={editData.lease_tenure_unit || 'month'}
-              onChange={(e) => setEditData({ ...editData, lease_tenure_unit: e.target.value })}
-              className="border p-2 w-full mb-3"
-            >
-              <option value="month">Month</option>
-              <option value="week">Week</option>
-            </select>
 
             <div className="flex justify-end space-x-2 mt-4">
               <button
@@ -337,7 +308,7 @@ function ApplicationList() {
               </button>
               <button
                 onClick={handleUpdateApplication}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-700"
               >
                 Save
               </button>
