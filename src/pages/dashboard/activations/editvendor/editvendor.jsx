@@ -199,13 +199,13 @@ function EditVendor() {
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2">
-            Customer Information
+            Vendor's Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {["first_name", "last_name", "email", "phone_number"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-bold text-black mb-1">
-                  {field.replace("_", " ").toUpperCase()}
+                  {field.replace("_", " ").toLowerCase()}
                 </label>
                 <input
                   type="text"

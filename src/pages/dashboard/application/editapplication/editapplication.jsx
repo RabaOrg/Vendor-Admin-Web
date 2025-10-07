@@ -85,7 +85,7 @@ function EditApplication() {
         bank_code: singleLoan?.application_data?.bank_code || "",
         account_number: singleLoan.customer_details?.bank_details?.account_number || "",
         account_name: singleLoan.customer_details?.bank_details?.account_name || "",
-        calculation_breakdown: singleLoan?.application_data.calculation_breakdown || prev.calculation_breakdown,
+        calculation_breakdown: singleLoan?.application_data?.calculation_breakdown || prev.calculation_breakdown,
         admin_notes: singleLoan?.admin_notes || "",
         last_review_date: singleLoan?.updated_at || "",
         review_status: singleLoan?.status || "",
@@ -203,7 +203,7 @@ function EditApplication() {
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Customer Information</h3>
+            <h3 className="text-xl font-semibold text-gray-700 mb-4">Customer's Information</h3>
             <div className="space-y-4">
 
               <div>
@@ -222,7 +222,7 @@ function EditApplication() {
                 <label className="block text-sm text-gray-600 mb-1">BVN</label>
                 <input
                   type="text"
-                  onChange={(e) => setFormData({ formData, customer_bvn: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, customer_bvn: e.target.value })}
                   value={formData?.customer_bvn}
                   className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

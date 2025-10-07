@@ -177,7 +177,7 @@ function EditGuarantorApplication() {
         {/* Customer Information */}
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2">
-            Customer Information
+            Guarantor's Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[

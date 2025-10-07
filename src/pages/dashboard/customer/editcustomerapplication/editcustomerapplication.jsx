@@ -157,7 +157,7 @@ function EditCustomerApplication() {
         {/* Customer Information */}
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2">
-            Customer Information
+            Customer's Information
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
@@ -177,16 +177,52 @@ function EditCustomerApplication() {
                 <label className="block text-sm font-bold text-black mb-1">
                   {field.replace("_", " ").toLowerCase()}
                 </label>
-                <input
-                  type="text"
-                  value={formData[field]}
-                  onChange={(e) =>
-                    setFormData({ ...formData, [field]: e.target.value })
-                  }
-                  className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                />
+
+
+                {field === "gender" ? (
+                  <select
+                    value={formData.gender || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, gender: e.target.value })
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                ) : field === "customer_status" ? (
+
+                  <select
+                    value={formData.customer_status || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, customer_status: e.target.value })
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  >
+                    <option value="">Select Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="awaiting_downpayment">awaiting_downpayment</option>
+                  </select>
+                ) : (
+
+                  <input
+                    type={field === "dob" ? "date" : "text"}
+                    value={formData[field] || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [field]: e.target.value })
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                )}
               </div>
             ))}
+
 
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm md:col-span-2 mt-6">
               <h3 className="text-xl font-semibold text-gray-700 mb-4">
