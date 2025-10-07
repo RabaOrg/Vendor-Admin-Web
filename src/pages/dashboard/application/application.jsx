@@ -292,7 +292,7 @@ function ApplicationList() {
             <label>Interest Rate (%)</label>
             <input
               type="number"
-              step="0.1"
+
               value={editData.interest_rate || ''}
               onChange={(e) => setEditData({ ...editData, interest_rate: e.target.value })}
               className="border p-2 w-full mb-3"
