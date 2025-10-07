@@ -64,6 +64,7 @@ function EditVendor() {
   const handleEdit = async () => {
     setIsLoading(true);
     try {
+      console.log(formData)
       const response = await handleEditVendorApp(id, formData);
       if (response) toast.success("Vendor edited successfully");
     } catch (error) {
@@ -192,7 +193,7 @@ function EditVendor() {
   return (
     <div className="max-w-7xl mx-auto p-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Edit Vendor ({singleLoan.account_name})
+        Edit Vendor ({singleLoan.first_name} {singleLoan.last_name})
       </h1>
 
       <div className="bg-white shadow-xl rounded-xl p-8 space-y-8">
